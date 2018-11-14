@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.example</groupId>
-	<artifactId>qr-read-generation-demo</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<artifactId>littlepo-poc-api</artifactId>
+	<version>1.0</version>
+	<packaging>war</packaging>
 
-	<name>qr-read-generation-demo</name>
-	<description>Demo project for Spring Boot</description>
+	<name>littlepo-poc-api</name>
+	<description>Littlepo POC APIs</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
