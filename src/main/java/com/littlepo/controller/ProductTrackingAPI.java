@@ -1,5 +1,6 @@
 package com.littlepo.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -30,6 +31,7 @@ import com.littlepo.data.ProductTrackingHistory;
 import com.littlepo.data.QrData;
 import com.littlepo.data.blockchain.TxHashResponse;
 import com.littlepo.service.ProductTrackingService;
+import com.littlepo.utils.IDGenerator;
 import com.littlepo.utils.UserAdmin;
 import com.littlepo.web3j.ContractController;
 
@@ -45,16 +47,29 @@ public class ProductTrackingAPI {
 	ProductTrackingService productTrackingService;
     
 	@RequestMapping(method = RequestMethod.POST, path = "/tracking/node-b", produces = "application/json")
-	@ApiOperation(value = "Product Tracking at Node-B of the supply chain process",
+	@ApiOperation(value = "Product Tracking at Node-B of the supply chain process, this will create product batch no and QR codes",
     notes = "Track product info")
-	public TxHashResponse trackProductAtNodeB(@RequestBody ProductTracking productTracking) {
+	public NodeBdata trackProductAtNodeB(@RequestBody NodeBdata nodeBdata) {
 		try {
-			NodeBdata nodeBdata = productTracking.getNodeBdata();
+			NodeBdata nodeBdata1 = nodeBdata;
 			
 			String userID = nodeBdata.getUserID();
 			Credentials credentials = new UserAdmin().getCredentials(userID);
-			TxHashResponse txHashResponse = productTrackingService.productTrackingAtNodeB(nodeBdata, credentials);
-			return txHashResponse;
+			
+			String productID = nodeBdata.getProductID();
+			if (productID == null) {
+				productID = "P";
+			}
+			String bBatchNo = IDGenerator.createBBatchNo(productID);
+			String bQrCodeID = IDGenerator.createBQrCodeID();
+			nodeBdata1.setBbatchNo(bBatchNo);
+			nodeBdata1.setBQrCodeID(bQrCodeID);
+			
+			TxHashResponse txHashResponse = productTrackingService.productTrackingAtNodeB(nodeBdata1, credentials);
+			nodeBdata1.setTxHash(txHashResponse.getTxHash());
+			nodeBdata1.setScAddress(txHashResponse.getContractAddress());
+			return nodeBdata1;
+			
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -63,15 +78,29 @@ public class ProductTrackingAPI {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, path = "/tracking/node-d", produces = "application/json")
-	@ApiOperation(value = "Product Tracking at Node-D of the supply chain process",
+	@ApiOperation(value = "Product Tracking at Node-D of the supply chain process, this will create product batch no and QR codes",
     notes = "Track product info")
-	public TxHashResponse trackProductAtNodeD(@RequestBody ProductTracking productTracking) {
+	public NodeDdata trackProductAtNodeD(@RequestBody NodeDdata nodeDdata) {
 		try {
-			NodeDdata nodeDdata = productTracking.getNodeDdata();
+			NodeDdata nodeDdata1 = nodeDdata;
 			String userID = nodeDdata.getUserID();
 			Credentials credentials = new UserAdmin().getCredentials(userID);
-			TxHashResponse txHashResponse = productTrackingService.productTrackingAtNodeD(nodeDdata, credentials);
-			return txHashResponse;
+			
+			String productID = nodeDdata.getProductID();
+			if (productID == null) {
+				productID = "P";
+			}
+			String dBatchNo = IDGenerator.createDBatchNo(productID);
+			String dQrCodeID = IDGenerator.createDQrCodeID();
+			String dxQrCodeID = IDGenerator.createDxQrCodeID();
+			nodeDdata1.setDbatchNo(dBatchNo);
+			nodeDdata1.setDQrCodeID(dQrCodeID);
+			nodeDdata1.setDxQrCodeID(dxQrCodeID);
+			
+			TxHashResponse txHashResponse = productTrackingService.productTrackingAtNodeD(nodeDdata1, credentials);
+			nodeDdata1.setTxHash(txHashResponse.getTxHash());
+			nodeDdata1.setScAddress(txHashResponse.getContractAddress());
+			return nodeDdata1;
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -80,15 +109,18 @@ public class ProductTrackingAPI {
 	}
 	
 	@RequestMapping(method = RequestMethod.POST, path = "/tracking/node-g", produces = "application/json")
-	@ApiOperation(value = "Product Tracking at Node-G of the supply chain process",
+	@ApiOperation(value = "Product Tracking at Node-G of the supply chain process.",
     notes = "Track product info")
-	public TxHashResponse trackProductAtNodeG(@RequestBody ProductTracking productTracking) {
+	public NodeGdata trackProductAtNodeG(@RequestBody NodeGdata nodeGdata) {
 		try {
-			NodeGdata nodeGdata = productTracking.getNodeGdata();
+			NodeGdata nodeGdata1 = nodeGdata;
 			String userID = nodeGdata.getUserID();
 			Credentials credentials = new UserAdmin().getCredentials(userID);
-			TxHashResponse txHashResponse = productTrackingService.productTrackingAtNodeG(nodeGdata, credentials);
-			return txHashResponse;
+			
+			TxHashResponse txHashResponse = productTrackingService.productTrackingAtNodeG(nodeGdata1, credentials);
+			nodeGdata1.setTxHash(txHashResponse.getTxHash());
+			nodeGdata1.setScAddress(txHashResponse.getContractAddress());
+			return nodeGdata1;
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -99,17 +131,83 @@ public class ProductTrackingAPI {
 	@RequestMapping(method = RequestMethod.POST, path = "/tracking/node-i", produces = "application/json")
 	@ApiOperation(value = "Product Tracking at Node-I of the supply chain process",
     notes = "Track product info")
-	public TxHashResponse trackProductAtNodeI(@RequestBody ProductTracking productTracking) {
+	public NodeIdata trackProductAtNodeI(@RequestBody NodeIdata nodeIdata) {
 		try {
-			NodeIdata nodeIdata = productTracking.getNodeIdata();
+			NodeIdata nodeIdata1 = nodeIdata;
 			String userID = nodeIdata.getUserID();
 			Credentials credentials = new UserAdmin().getCredentials(userID);
 			TxHashResponse txHashResponse = productTrackingService.productTrackingAtNodeI(nodeIdata, credentials);
-			return txHashResponse;
+			nodeIdata1.setTxHash(txHashResponse.getTxHash());
+			nodeIdata1.setScAddress(txHashResponse.getContractAddress());
+			return nodeIdata1;
 
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new InternalServerError("Error while tracking product info", ex);
+		}
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, path = "/tracking/node-b", produces = "application/json")
+	@ApiOperation(value = "query product tracking at Node-B of the supply chain process",
+    notes = "Query product tracking info at node B")
+	public NodeBdata queryProductAtNodeB(@RequestParam String qrCodeID) {
+		try {
+			
+			Credentials credentials = new UserAdmin().getDefaultCredentials();
+			NodeBdata nodeBdata = productTrackingService.queryProductTrackingAtNodeB(qrCodeID, credentials);
+			return nodeBdata;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new InternalServerError("Error while query product tracking info", ex);
+		}
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, path = "/tracking/node-d", produces = "application/json")
+	@ApiOperation(value = "query product tracking at Node-D of the supply chain process",
+    notes = "Query product tracking info at node D")
+	public NodeDdata queryProductAtNodeD(@RequestParam String qrCodeID) {
+		try {
+			
+			Credentials credentials = new UserAdmin().getDefaultCredentials();
+			NodeDdata nodeDdata = productTrackingService.queryProductTrackingAtNodeD(qrCodeID, credentials);
+			return nodeDdata;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new InternalServerError("Error while query product tracking info", ex);
+		}
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, path = "/tracking/node-g", produces = "application/json")
+	@ApiOperation(value = "query product tracking at Node-G of the supply chain process",
+    notes = "Query product tracking info at node G")
+	public NodeGdata queryProductAtNodeG(@RequestParam String qrCodeID) {
+		try {
+			
+			Credentials credentials = new UserAdmin().getDefaultCredentials();
+			NodeGdata nodeGdata = productTrackingService.queryProductTrackingAtNodeG(qrCodeID, credentials);
+			return nodeGdata;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new InternalServerError("Error while query product tracking info", ex);
+		}
+	}
+	
+	@RequestMapping(method = RequestMethod.GET, path = "/tracking/node-i", produces = "application/json")
+	@ApiOperation(value = "query product tracking at Node-G of the supply chain process",
+    notes = "Query product tracking info at node I")
+	public NodeIdata queryProductAtNodeI(@RequestParam String qrCodeID) {
+		try {
+			
+			Credentials credentials = new UserAdmin().getDefaultCredentials();
+			NodeIdata nodeIdata = productTrackingService.queryProductTrackingAtNodeI(qrCodeID, credentials);
+			return nodeIdata;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new InternalServerError("Error while query product tracking info", ex);
 		}
 	}
 	
@@ -194,35 +292,7 @@ public class ProductTrackingAPI {
     			throw new InternalServerError("Error while getting info", ex);
     	} 	        
     }
-    
-	@RequestMapping(method = RequestMethod.POST, path = "/product", produces = "application/json")
-	@ApiOperation(value = "Create a new product.",
-    notes = "Create a new product.")
-	public TxHashResponse createProduct(@RequestBody Product product) {
-		try {
-			Credentials credentials = new UserAdmin().getDefaultCredentials();
-			TxHashResponse txHashResponse = productTrackingService.createProduct(product, credentials);
-			return txHashResponse;
-
-		} catch (Exception ex) {
-			throw new InternalServerError("Error while tracking product info", ex);
-		}
-	}
 	
-    
-	@RequestMapping(method = RequestMethod.POST, path = "/productbatch", produces = "application/json")
-	@ApiOperation(value = "Create a new product batch.",
-    notes = "Create a new product batch.")
-	public TxHashResponse createProductBatch(@RequestBody ProductBatch productBatch) {
-		try {
-			Credentials credentials = new UserAdmin().getDefaultCredentials();
-			TxHashResponse txHashResponse = productTrackingService.createProductBatch(productBatch, credentials);
-			return txHashResponse;
-
-		} catch (Exception ex) {
-			throw new InternalServerError("Error while tracking product info", ex);
-		}
-	}
 	
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
 	public class InternalServerError extends RuntimeException {

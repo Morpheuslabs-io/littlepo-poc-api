@@ -2,8 +2,11 @@ package com.littlepo.data;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.littlepo.utils.CommonConstants;
 
+@JsonInclude(Include.NON_NULL)
 public class NodeBdata extends NodeData{
 	
 	private String bQrCodeID;
@@ -12,7 +15,9 @@ public class NodeBdata extends NodeData{
 	private String packageType;
 	private String producerID;
 	
-	
+	public String getNodeID() {
+		return CommonConstants.NODE_TYPE_B;
+	}	
 	public String getNodeType() {
 		return CommonConstants.NODE_TYPE_B;
 	}
@@ -46,6 +51,6 @@ public class NodeBdata extends NodeData{
 	}	
 	public void setProducerID(String producerID) {
 		this.producerID = producerID;
-	}	
+	}
 	
 }

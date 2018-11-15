@@ -2,11 +2,14 @@ package com.littlepo.data;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.littlepo.utils.CommonConstants;
 
+@JsonInclude(Include.NON_NULL)
 public class NodeDdata extends NodeData{
 	
-	private List<String> dxQrCodeIDs;
+	private String dxQrCodeID;
 	private String dQRcodeID;
 	private String bBatchNo;
 	private String dBatchNo;
@@ -16,15 +19,17 @@ public class NodeDdata extends NodeData{
 	private String producerID;
 	private String legalEntity1;
 	
-	
+	public String getNodeID() {
+		return CommonConstants.NODE_TYPE_D;
+	}	
 	public String getNodeType() {
 		return CommonConstants.NODE_TYPE_D;
 	}
 	public String getDQrCodeID() {
 		return this.dQRcodeID;
 	}
-	public List<String> getDxQrCodeIDs() {
-		return this.dxQrCodeIDs;
+	public String getDxQrCodeID() {
+		return this.dxQrCodeID;
 	}
 	public String getBbatchNo() {
 		return this.bBatchNo;
@@ -52,8 +57,8 @@ public class NodeDdata extends NodeData{
 	public void setDQrCodeID(String dQRcodeID) {
 		this.dQRcodeID = dQRcodeID;
 	}
-	public void setDxQrCodeIDs(List<String> dxQrCodeIDs) {
-		this.dxQrCodeIDs = dxQrCodeIDs;
+	public void setDxQrCodeID(String dxQrCodeID) {
+		this.dxQrCodeID = dxQrCodeID;
 	}
 	public void setBbatchNo(String bBatchNo) {
 		this.bBatchNo = bBatchNo;

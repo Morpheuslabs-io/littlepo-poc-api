@@ -2,6 +2,10 @@ package com.littlepo.data;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
 public class ProductBatch{
 	
 	
@@ -9,9 +13,12 @@ public class ProductBatch{
 	private String productID;
 	private String productName;
 	private String producerID;
+	private String location;
+	private String packageID;
+	private String packageType;
 	private String creationTime;
 	private int qty;
-	private List<String> listOfProductSerielNo;
+	private List<String> listOfQrCodeIds;
 	
 	public String getProductBatchNo() {
 		return this.productBatchNo;
@@ -31,8 +38,17 @@ public class ProductBatch{
 	public int getQty() {
 		return this.qty;
 	}
-	public List<String> getListOfProductSerielNo () {
-		return this.listOfProductSerielNo;
+	public String getLocation() {
+		return this.location;
+	}
+	public String getPackageID() {
+		return this.packageID;
+	}
+	public String getPackageType() {
+		return this.packageType;
+	}
+	public List<String> getListOfQrCodeIds () {
+		return this.listOfQrCodeIds;
 	}
 	public void setProductBatchNo (String productBatchNo) {
 		this.productBatchNo = productBatchNo;
@@ -52,9 +68,18 @@ public class ProductBatch{
 	public void setQty (int qty) {
 		this.qty = qty;
 	}
+	public void setLocation (String location) {
+		this.location = location;
+	}
+	public void setPackageID (String packageID) {
+		this.packageID = packageID;
+	}
+	public void setPackageType (String packageType) {
+		this.packageID = packageType;
+	}
 	
 	// product serial number = QR code ID
-	public void setListOfProductSerielNo (List<String> listOfProductSerielNo) {
-		this.listOfProductSerielNo = listOfProductSerielNo;
+	public void setListOfQrCodeIds (List<String> listOfQrCodeIds) {
+		this.listOfQrCodeIds = listOfQrCodeIds;
 	}
 }

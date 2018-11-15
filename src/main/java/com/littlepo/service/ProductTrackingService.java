@@ -33,13 +33,46 @@ public class ProductTrackingService {
 	
 	public TxHashResponse productTrackingAtNodeB(NodeBdata nodeBdata, Credentials credentials) throws Exception {
 		
-		// call smart contract Update Product Tracking  function
-		
-		// call update product tracking info function in the smart contract
 		ContractController contractController = new ContractController(web3Properties);
 		TxHashResponse txHashResponse = contractController.trackProductAtHarvesterNode(nodeBdata, credentials);
 
 		return txHashResponse;
+		
+	}
+	
+	public NodeBdata queryProductTrackingAtNodeB(String qrCodeID, Credentials credentials) throws Exception {
+		
+		ContractController contractController = new ContractController(web3Properties);
+		NodeBdata nodeBdata = contractController.queryProductAtHarvesterNode(qrCodeID, credentials);
+
+		return nodeBdata;
+		
+	}
+	
+	public NodeDdata queryProductTrackingAtNodeD(String qrCodeID, Credentials credentials) throws Exception {
+		
+		ContractController contractController = new ContractController(web3Properties);
+		NodeDdata nodeDdata = contractController.queryProductAtPackerNode(qrCodeID, credentials);
+
+		return nodeDdata;
+		
+	}
+	
+	public NodeGdata queryProductTrackingAtNodeG(String qrCodeID, Credentials credentials) throws Exception {
+		
+		ContractController contractController = new ContractController(web3Properties);
+		NodeGdata nodeGdata = contractController.queryLittlepoNode(qrCodeID, credentials);
+
+		return nodeGdata;
+		
+	}
+	
+	public NodeIdata queryProductTrackingAtNodeI(String qrCodeID, Credentials credentials) throws Exception {
+		
+		ContractController contractController = new ContractController(web3Properties);
+		NodeIdata nodeIdata = contractController.queryRetailShopNode(qrCodeID, credentials);
+
+		return nodeIdata;
 		
 	}
 	

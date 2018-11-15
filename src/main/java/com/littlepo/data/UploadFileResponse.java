@@ -1,6 +1,9 @@
 package com.littlepo.data;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+@JsonInclude(Include.NON_NULL)
 public class UploadFileResponse {
     private String fileName;
     private String fileDownloadUri;

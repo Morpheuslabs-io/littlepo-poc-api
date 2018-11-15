@@ -1,5 +1,9 @@
 package com.littlepo.data;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
 public class NodeData {
 	
 	private String nodeID;
@@ -9,6 +13,8 @@ public class NodeData {
 	private String createTime;
 	private String productID;
 	private String productName;
+	private String txHash;
+	private String scAddress;
 
 	public void setNodeID(String nodeID) {
 		this.nodeID = nodeID;
@@ -31,6 +37,13 @@ public class NodeData {
 	public void setProductName(String productName) {
 		this.productName = productName;
 	}
+	public void setTxHash(String txHash) {
+		this.txHash = txHash;
+	}
+	public void setScAddress(String scAddress) {
+		this.scAddress = scAddress;
+	}
+
 	public String getNodeID() {
 		return this.nodeID;
 	}
@@ -51,6 +64,12 @@ public class NodeData {
 	}
 	public String getProductName() {
 		return this.productName;
+	}
+	public String getTxHash() {
+		return this.txHash;
+	}
+	public String getScAddress() {
+		return this.scAddress;
 	}
 	
 }

@@ -2,11 +2,13 @@ package com.littlepo.web3j;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.tomcat.util.codec.binary.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.web3j.abi.datatypes.DynamicArray;
 import org.web3j.abi.datatypes.generated.Bytes32;
@@ -289,8 +291,7 @@ public class ContractController extends AbstractContractManager {
         
         Bytes32 productBatchId = Web3jUtils.stringToBytes32(nodeIdata.getDQrCodeID());
         Bytes32 dBatchNo = Web3jUtils.stringToBytes32(nodeIdata.getDbatchNo());
-        List<String> dxQrCodeIDs = nodeIdata.getDxQrCodeIDs();
-        Bytes32 dxQrCodeID = Web3jUtils.stringToBytes32(dxQrCodeIDs.get(0));
+        Bytes32 dxQrCodeID = Web3jUtils.stringToBytes32(nodeIdata.getDxQrCodeID());
         Bytes32 bBatchNo = Web3jUtils.stringToBytes32(nodeIdata.getBbatchNo());
         Bytes32 productName =  Web3jUtils.stringToBytes32(nodeIdata.getProductName());
         Bytes32 location =  Web3jUtils.stringToBytes32(nodeIdata.getLocation());
@@ -333,11 +334,196 @@ public class ContractController extends AbstractContractManager {
 		
 		TxHashResponse txHashResponse = new TxHashResponse();
 		txHashResponse.setTxHash(txHash);
-		txHashResponse.setContractAddress(littlepoNode.getContractAddress());
+		txHashResponse.setContractAddress(retailShopNode.getContractAddress());
 		txHashResponse.setSubmiitedTime(timestamp3);
 		
 		return txHashResponse;
 		
+	}
+	
+	public NodeBdata queryProductAtHarvesterNode(String qrCodeID, Credentials credentials) throws Exception {
+		
+        NodeBdata nodeBdata = new NodeBdata();
+   
+        Bytes32 qrCodeIDByte32 = Web3jUtils.stringToBytes32(qrCodeID);
+        accessProductHarvesterNode(credentials);
+		DynamicArray<Bytes32> productHarvesterBatch = productHarvesterNode.getProductBatchInfo(qrCodeIDByte32).send();
+		
+		productHarvesterBatch = productHarvesterNode.getProductBatchInfo(qrCodeIDByte32).send();
+       // bBatchNo
+       // productName
+       // location
+       // productId
+       // producerId
+       // containerId
+       // containerType
+       // legalEntity
+		List<Bytes32> productHarvesterBatchValue = productHarvesterBatch.getValue();
+	    
+		String bBatchNo = Web3jUtils.removePadding(new String(productHarvesterBatchValue.get(0).getValue()));
+		String productName = Web3jUtils.removePadding(new String(productHarvesterBatchValue.get(1).getValue()));
+		String location = Web3jUtils.removePadding(new String(productHarvesterBatchValue.get(2).getValue()));
+		String productID = Web3jUtils.removePadding(new String(productHarvesterBatchValue.get(3).getValue()));
+		String producerID = Web3jUtils.removePadding(new String(productHarvesterBatchValue.get(4).getValue()));
+		String containerId = Web3jUtils.removePadding(new String(productHarvesterBatchValue.get(5).getValue()));
+		String packageType = Web3jUtils.removePadding(new String(productHarvesterBatchValue.get(6).getValue()));
+		String legalEntity = Web3jUtils.removePadding(new String(productHarvesterBatchValue.get(7).getValue()));	
+		
+		nodeBdata.setBbatchNo(bBatchNo);
+		nodeBdata.setProductID(productID);
+		nodeBdata.setProductName(productName);
+		nodeBdata.setProducerID(producerID);
+		nodeBdata.setLocation(location);
+		nodeBdata.setLegalEntity(legalEntity);
+		nodeBdata.setPackageType(packageType);
+		nodeBdata.setBQrCodeID(qrCodeID);
+		
+		return nodeBdata;
+		
+	}
+	
+	public NodeDdata queryProductAtPackerNode(String qrCodeID, Credentials credentials) throws Exception {
+		
+        NodeDdata nodeDdata = new NodeDdata();
+   
+        Bytes32 qrCodeIDByte32 = Web3jUtils.stringToBytes32(qrCodeID);
+        accessProductPackerNode(credentials);
+		DynamicArray<Bytes32> productPackerBatch = productPackerNode.getProductBatchInfo(qrCodeIDByte32).send();
+       // bBatchNo
+       // productName
+       // location
+       // productId
+       // producerId
+       // containerId
+       // containerType
+       // legalEntity
+		
+	   // dBatchNo
+	   // weight
+		List<Bytes32> productPackerBatchValue = productPackerBatch.getValue();
+	    
+		String bBatchNo = Web3jUtils.removePadding(new String(productPackerBatchValue.get(0).getValue()));
+		String productName = Web3jUtils.removePadding(new String(productPackerBatchValue.get(1).getValue()));
+		String location = Web3jUtils.removePadding(new String(productPackerBatchValue.get(2).getValue()));
+		String productID = Web3jUtils.removePadding(new String(productPackerBatchValue.get(3).getValue()));
+		String producerID = Web3jUtils.removePadding(new String(productPackerBatchValue.get(4).getValue()));
+		String containerId = Web3jUtils.removePadding(new String(productPackerBatchValue.get(5).getValue()));
+		String packageType = Web3jUtils.removePadding(new String(productPackerBatchValue.get(6).getValue()));
+		String legalEntity = Web3jUtils.removePadding(new String(productPackerBatchValue.get(7).getValue()));
+		
+		String dBatchNo = Web3jUtils.removePadding(new String(productPackerBatchValue.get(8).getValue()));
+		String weight = Web3jUtils.removePadding(new String(productPackerBatchValue.get(9).getValue()));	
+		
+		nodeDdata.setBbatchNo(bBatchNo);
+		nodeDdata.setProductID(productID);
+		nodeDdata.setProductName(productName);
+		nodeDdata.setProducerID(producerID);
+		nodeDdata.setLocation(location);
+		nodeDdata.setLegalEntity(legalEntity);
+		nodeDdata.setPackageType(packageType);
+		nodeDdata.setDQrCodeID(qrCodeID);
+		
+		nodeDdata.setDbatchNo(bBatchNo);
+		nodeDdata.setWeight(weight);
+		
+		return nodeDdata;
+	}
+	
+	public NodeGdata queryLittlepoNode(String qrCodeID, Credentials credentials) throws Exception {
+		
+        NodeGdata nodeGdata = new NodeGdata();
+   
+        Bytes32 qrCodeIDByte32 = Web3jUtils.stringToBytes32(qrCodeID);
+        accessLittlepoNode(credentials);
+		DynamicArray<Bytes32> littlepoBatch = littlepoNode.getProductBatchInfo(qrCodeIDByte32).send();
+       // bBatchNo
+       // productName
+       // location
+       // productId
+       // producerId
+       // containerId
+       // containerType
+       // legalEntity
+		
+	   // dBatchNo
+	   // weight
+		List<Bytes32> littlepoBatchValue = littlepoBatch.getValue();
+	    
+		String bBatchNo = Web3jUtils.removePadding(new String(littlepoBatchValue.get(0).getValue()));
+		String productName = Web3jUtils.removePadding(new String(littlepoBatchValue.get(1).getValue()));
+		String location = Web3jUtils.removePadding(new String(littlepoBatchValue.get(2).getValue()));
+		String productID = Web3jUtils.removePadding(new String(littlepoBatchValue.get(3).getValue()));
+		String producerID = Web3jUtils.removePadding(new String(littlepoBatchValue.get(4).getValue()));
+		String containerId = Web3jUtils.removePadding(new String(littlepoBatchValue.get(5).getValue()));
+		String packageType = Web3jUtils.removePadding(new String(littlepoBatchValue.get(6).getValue()));
+		String legalEntity = Web3jUtils.removePadding(new String(littlepoBatchValue.get(7).getValue()));
+		
+		String dBatchNo = Web3jUtils.removePadding(new String(littlepoBatchValue.get(8).getValue()));
+		String weight = Web3jUtils.removePadding(new String(littlepoBatchValue.get(9).getValue()));	
+		
+		nodeGdata.setBbatchNo(bBatchNo);
+		nodeGdata.setProductID(productID);
+		nodeGdata.setProductName(productName);
+		nodeGdata.setProducerID(producerID);
+		nodeGdata.setLocation(location);
+		nodeGdata.setLegalEntity(legalEntity);
+		nodeGdata.setPackageType(packageType);
+		nodeGdata.setDQrCodeID(qrCodeID);
+		
+		nodeGdata.setDbatchNo(bBatchNo);
+		nodeGdata.setWeight(weight);
+		
+		return nodeGdata;
+	}
+	
+	public NodeIdata queryRetailShopNode(String qrCodeID, Credentials credentials) throws Exception {
+		
+        NodeIdata nodeIdata = new NodeIdata();
+   
+        Bytes32 qrCodeIDByte32 = Web3jUtils.stringToBytes32(qrCodeID);
+        accessRetailShopNode(credentials);
+		DynamicArray<Bytes32> retailShopBatch = retailShopNode.getProductBatchInfo(qrCodeIDByte32).send();
+		// bBatchNo
+		// productName
+		// location
+		// productId
+		// producerId
+		// containerId
+		// containerType
+		// legalEntity
+
+		// dBatchNo
+		// dxQRCodeId
+		// quantity
+		
+		List<Bytes32> retailShopBatchValue = retailShopBatch.getValue();
+	    
+		String bBatchNo = Web3jUtils.removePadding(new String(retailShopBatchValue.get(0).getValue()));
+		String productName = Web3jUtils.removePadding(new String(retailShopBatchValue.get(1).getValue()));
+		String location = Web3jUtils.removePadding(new String(retailShopBatchValue.get(2).getValue()));
+		String productID = Web3jUtils.removePadding(new String(retailShopBatchValue.get(3).getValue()));
+		String producerID = Web3jUtils.removePadding(new String(retailShopBatchValue.get(4).getValue()));
+		String containerId = Web3jUtils.removePadding(new String(retailShopBatchValue.get(5).getValue()));
+		String packageType = Web3jUtils.removePadding(new String(retailShopBatchValue.get(6).getValue()));
+		String legalEntity = Web3jUtils.removePadding(new String(retailShopBatchValue.get(7).getValue()));
+		
+		String dBatchNo = Web3jUtils.removePadding(new String(retailShopBatchValue.get(8).getValue()));
+		String dxQRCodeId = Web3jUtils.removePadding(new String(retailShopBatchValue.get(9).getValue()));
+		
+		nodeIdata.setBbatchNo(bBatchNo);
+		nodeIdata.setProductID(productID);
+		nodeIdata.setProductName(productName);
+		nodeIdata.setProducerID(producerID);
+		nodeIdata.setLocation(location);
+		nodeIdata.setLegalEntity(legalEntity);
+		nodeIdata.setPackageType(packageType);
+		nodeIdata.setDQrCodeID(qrCodeID);
+		
+		nodeIdata.setDbatchNo(bBatchNo);
+		
+		nodeIdata.setDxQrCodeID(dxQRCodeId);
+		
+		return nodeIdata;
 	}
 	
 	public ProductBatch getProductBatchInfoByBatchNo(String nodeID, String productBatchNo, Credentials credentials) throws Exception {
@@ -346,6 +532,8 @@ public class ContractController extends AbstractContractManager {
         
 		accessRetailShopNode(credentials);
 		
+		
+		
 		return productBatch;
 		
 	}
@@ -353,8 +541,33 @@ public class ContractController extends AbstractContractManager {
 	public ProductBatch getProductBatchInfoByQrCodeID(String qrCodeID, Credentials credentials) throws Exception {
 		
         ProductBatch productBatch = new ProductBatch();
-        
-		accessRetailShopNode(credentials);
+   
+        Bytes32 qrCodeIDByte32 = Web3jUtils.stringToBytes32(qrCodeID);
+        accessProductHarvesterNode(credentials);
+		DynamicArray<Bytes32> productHarvesterBatch = productHarvesterNode.getProductBatchInfo(qrCodeIDByte32).sendAsync().get();
+       // bBatchNo
+       // productName
+       // location
+       // productId
+       // producerId
+       // containerId
+       // containerType
+       // legalEntity
+		List<Bytes32> productHarvesterBatchValue = productHarvesterBatch.getValue();
+
+		String productBatchNo = Web3jUtils.hexToASCII(new String(productHarvesterBatchValue.get(0).getValue()));
+		String productName = new String(productHarvesterBatchValue.get(1).getValue(), StandardCharsets.UTF_8);
+		String location = new String(productHarvesterBatchValue.get(2).getValue());
+		String productID = new String(productHarvesterBatchValue.get(3).getValue());
+		String producerID = new String(productHarvesterBatchValue.get(4).getValue());
+		String containerId = new String(productHarvesterBatchValue.get(5).getValue());
+		String containerType = new String(productHarvesterBatchValue.get(6).getValue());
+		String legalEntity = new String(productHarvesterBatchValue.get(7).getValue());	
+		
+		productBatch.setProductBatchNo(productBatchNo);
+		productBatch.setProductID(productID);
+		productBatch.setProductName(productName);
+		productBatch.setProducerID(producerID);
 		
 		return productBatch;
 		

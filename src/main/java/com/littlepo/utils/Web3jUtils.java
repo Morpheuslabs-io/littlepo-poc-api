@@ -260,4 +260,29 @@ public class Web3jUtils {
         return new Bytes32(byteValueLen32);
     }
 	
+	public static String hexToASCII(String hexValue)
+    {
+        StringBuilder output = new StringBuilder("");
+        for (int i = 0; i < hexValue.length(); i += 2)
+        {
+            String str = hexValue.substring(i, i + 2);
+            output.append((char) Integer.parseInt(str, 16));
+        }
+        return output.toString();
+    }
+	
+	public static String removePadding(String string) {
+		int index;
+		for (index = 0; index < string.length(); index++)
+		{
+		    char c = string.charAt(index);
+		    if (c == '\0')
+		    {
+		        break;
+		    }
+		}
+		string = string.substring(0, index);
+		return string;
+	}
+	
 }

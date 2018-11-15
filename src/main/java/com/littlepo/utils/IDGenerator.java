@@ -10,8 +10,8 @@ public class IDGenerator {
 	private static AtomicLong dQrCodeIdCounter = new AtomicLong();
 	private static AtomicLong bQrCodeIdCounter = new AtomicLong();
 	private static AtomicLong dxQrCodeIdCounter = new AtomicLong();
-	private static AtomicLong dBatchNoCounter = new AtomicLong();
-	private static AtomicLong bBatchNoCounter = new AtomicLong();
+	private static String dBatchNoString = "D-" + getDateString();
+	private static String bBatchNoString = "B-" + getDateString();
 
 	
 	public static String getUUID() {
@@ -23,35 +23,39 @@ public class IDGenerator {
 
 	public static String createBQrCodeID()
 	{
-		String prefix = getDateString();
+		String prefix = getDateTimeString();
 		return String.valueOf("BQ" + prefix + bQrCodeIdCounter.getAndIncrement());
 	}
 	
-	public static String createdDQrCodeID()
+	public static String createDQrCodeID()
 	{
-		String prefix = getDateString();
+		String prefix = getDateTimeString();
 		return String.valueOf("DQ" + prefix + dQrCodeIdCounter.getAndIncrement());
 	}
 	
 	public static String createDxQrCodeID()
 	{
-		String prefix = getDateString();
+		String prefix = getDateTimeString();
 		return String.valueOf("DXQ" + prefix + dxQrCodeIdCounter.getAndIncrement());
 	}
 	
-	public static String createDBatchNo()
+	public static String createDBatchNo(String productID)
 	{
-		String prefix = getDateString();
-		return String.valueOf("DB" + prefix + dBatchNoCounter.getAndIncrement());
+		return productID + "-" + dBatchNoString;
 	}
 	
-	public static String createBBatchNo()
+	public static String createBBatchNo(String productID)
 	{
-		String prefix = getDateString();
-		return String.valueOf("BB" + prefix + bBatchNoCounter.getAndIncrement());
+
+		return productID + "-" + bBatchNoString;
 	}
 	
 	private static String getDateString() {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyMdd");
+		String date = sdf.format(new Date()); 
+		return date;
+	}
+	private static String getDateTimeString() {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyMddHHmm");
 		String date = sdf.format(new Date()); 
 		return date;

@@ -1,5 +1,9 @@
 package com.littlepo.data;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+@JsonInclude(Include.NON_NULL)
 public class ProductTracking {
 	private String qrCodeID; // QR Code ID of a finished product
 	private String productBatchNo;
