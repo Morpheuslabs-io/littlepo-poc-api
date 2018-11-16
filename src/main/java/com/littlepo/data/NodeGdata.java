@@ -53,7 +53,7 @@ public class NodeGdata extends NodeData{
 	public void setDQrCodeID(String dQRcodeID) {
 		this.dQRcodeID = dQRcodeID;
 	}
-	public void setDxQrCodeIDs(String dxQrCodeID) {
+	public void setDxQrCodeID(String dxQrCodeID) {
 		this.dxQrCodeID = dxQrCodeID;
 	}
 	public void setBbatchNo(String bBatchNo) {

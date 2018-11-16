@@ -13,7 +13,7 @@ public class Web3Properties {
 	private String addressProductPackerNode = "";
 	private String addressLittlepoNode = "";
 	private String addressRetailShopNode = "";
-	private String addressLittlepoProductHistory = "";
+	private String addressLittlepoProductTrackingHistory = "";
 	private String addressLittlepoProductTracking = "";
 
 	public void setClientIP(String clientIP) {
@@ -54,11 +54,11 @@ public class Web3Properties {
 	public String getAddressLittlepoNode() {
 		return this.addressLittlepoNode;
 	}
-	public void setAddressLittlepoProductHistory(String addressLittlepoProductHistory) {
-		this.addressLittlepoProductHistory = addressLittlepoProductHistory;
+	public void setAddressLittlepoProductTrackingHistory(String addressLittlepoProductTrackingHistory) {
+		this.addressLittlepoProductTrackingHistory = addressLittlepoProductTrackingHistory;
 	}
-	public String getAddressLittlepoProductHistory() {
-		return this.addressLittlepoProductHistory;
+	public String getAddressLittlepoProductTrackingHistory() {
+		return this.addressLittlepoProductTrackingHistory;
 	}
 	public void setAddressLittlepoProductTracking(String addressLittlepoProductTracking) {
 		this.addressLittlepoProductTracking = addressLittlepoProductTracking;

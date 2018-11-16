@@ -108,28 +108,7 @@ public class ProductTrackingService {
 		return txHashResponse;
 		
 	}
-	
-	public TxHashResponse createProduct(Product product, Credentials credentials) throws Exception{
-		
-		// 
-		// call smart contract to create a new product
-		ContractController contractController = new ContractController(web3Properties);
-		TxHashResponse txHashResponse = contractController.createProduct(product, credentials);
 
-		return txHashResponse;
-		
-	}
-	
-	public TxHashResponse createProductBatch(ProductBatch productBatch, Credentials credentials) throws Exception{
-		
-		// 
-		// call smart contract to create a new product batch
-		ContractController contractController = new ContractController(web3Properties);
-		TxHashResponse txHashResponse = contractController.createProductBatch(productBatch, credentials);
-
-		return txHashResponse;
-		
-	}
 	
 	public Product getProductInfoByProductID (String productID, Credentials credentials) {
 		// get Product Info by product ID function
@@ -149,11 +128,13 @@ public class ProductTrackingService {
 		return productBatch;
 	}
 	
-	public ProductTrackingHistory getProductTrackingHistory (String qrCodeID, Credentials credentials) {
+	public ProductTrackingHistory getProductTrackingHistory (String qrCodeID, Credentials credentials) throws Exception {
 		
 		// call query product tracking history info function in the smart contract
 		
 		ProductTrackingHistory productTrackingHistory = new ProductTrackingHistory();
+		ContractController contractController = new ContractController(web3Properties);
+		productTrackingHistory = contractController.getProductTrackingHistory(qrCodeID, credentials);
 		return productTrackingHistory;
 		
 	}
