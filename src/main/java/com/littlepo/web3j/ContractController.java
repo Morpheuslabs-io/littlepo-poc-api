@@ -17,6 +17,7 @@ import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
+import org.web3j.tuples.generated.Tuple3;
 import org.web3j.tuples.generated.Tuple7;
 import org.web3j.tuples.generated.Tuple8;
 import org.web3j.tx.ChainId;
@@ -29,6 +30,7 @@ import org.web3j.utils.Numeric;
 
 import com.littlepo.config.Web3Properties;
 import com.littlepo.data.NodeBdata;
+import com.littlepo.data.NodeData;
 import com.littlepo.data.NodeDdata;
 import com.littlepo.data.NodeGdata;
 import com.littlepo.data.NodeIdata;
@@ -41,6 +43,8 @@ import com.littlepo.utils.Orchard;
 import com.littlepo.utils.Web3jConstants;
 import com.littlepo.utils.Web3jUtils;
 import com.littlepo.web3j.wrapper.LittlepoNode;
+import com.littlepo.web3j.wrapper.LittlepoProductHistory;
+import com.littlepo.web3j.wrapper.LittlepoProductTracking;
 import com.littlepo.web3j.wrapper.ProductHarvesterNode;
 import com.littlepo.web3j.wrapper.ProductPackerNode;
 import com.littlepo.web3j.wrapper.RetailShopNode;
@@ -64,6 +68,8 @@ public class ContractController extends AbstractContractManager {
 	private ProductPackerNode productPackerNode;
 	private LittlepoNode littlepoNode;
 	private RetailShopNode retailShopNode;
+	private LittlepoProductHistory littlepoProductHistory;
+	private LittlepoProductTracking littlepoProductTracking;
 	
 	@Override
 	public void run() throws Exception {
@@ -583,25 +589,52 @@ public class ContractController extends AbstractContractManager {
 		
 	}
 	
+	/*
 	public ProductTrackingHistory getProductTrackingHistory(String qrCodeID, Credentials credentials) throws Exception {
 		
         ProductTrackingHistory productTrackingHistory = new ProductTrackingHistory();
+        List<NodeData> listOfNodeData = new ArrayList<NodeData> ();
         
-		accessRetailShopNode(credentials);
+		accessLittlepoProductTracking(credentials);
+		
+		// nodeID, qrCodeID, timestamp
+		
+		Tuple3<DynamicArray<Bytes32>, DynamicArray<Bytes32>, DynamicArray<Uint256>> result 
+			= littlepoProductTracking.getProductTrackingInfo(Web3jUtils.stringToBytes32(qrCodeID)).send();
+		
+		List<Bytes32> nodeIDs = result.getValue1().getValue();
+		List<Bytes32>  qrCodeIDs = result.getValue2().getValue();
+		List<Uint256>  createTimes = result.getValue3().getValue();
+		
+		int cnt = nodeIDs.size();
+		
+		for (int i = 0; i < cnt; i++) {
+			NodeData nodeData = new NodeData();
+			String nodeID = Web3jUtils.removePadding(new String(nodeIDs.get(i).getValue()));
+			String qrCodeID1 = Web3jUtils.removePadding(new String(qrCodeIDs.get(i).getValue()));
+			String createTime = 
+			nodeData.setNodeID(nodeID);
+			nodeData.setNodeID(qrCodeID1);
+			nodeData.setCreateTime(createTime);
+			nodeData.set(Web3jUtils.removePadding(new String(nodeIDs.get(i).getValue())));
+		}
 		
 		return productTrackingHistory;
 		
 	}
+	*/
+	/*
 	
 	public ProductTracking getProductTracking(String qrCodeID, Credentials credentials) throws Exception {
 		
         ProductTracking productTracking = new ProductTracking();
         
-		accessRetailShopNode(credentials);
+		accessProduct(credentials);
 		
 		return productTracking;
 		
 	}
+	*/
 
 	public static void main(String [] args) throws Exception  {
 		new ContractController(args).run();
@@ -688,6 +721,60 @@ public class ContractController extends AbstractContractManager {
 		}
 		
 	}
+	private void accessLittlepoProductHistory(Credentials credentials) throws Exception {
+		
+        Timestamp timestamp1 = new Timestamp((new Date()).getTime());
+		System.out.println("accessLittlepoProductHistory: started at " + timestamp1);
+        
+		TransactionReceiptProcessor transactionReceiptProcessor = new NoOpProcessor(web3j);
+
+		TransactionManager transactionManager = new FastRawTransactionManager(
+				web3j, 
+				credentials, 
+				ChainId.NONE, 
+				transactionReceiptProcessor); 
+		
+		String addressLittlepoProductHistory = web3Properties.getAddressLittlepoProductHistory();
+
+		System.out.println("accessLittlepoProductHistory: address is " + addressLittlepoProductHistory);
+
+		if (littlepoProductHistory == null) {
+			littlepoProductHistory = littlepoProductHistory.load
+					(addressLittlepoProductHistory, web3j, transactionManager, new DefaultGasProvider()); // use default Transaction Manager
+			Timestamp timestamp2 = new Timestamp((new Date()).getTime());
+
+			System.out.println("accessLittlepoProductHistory: ended at " + timestamp2);
+		}
+		
+	}
+	
+	private void accessLittlepoProductTracking(Credentials credentials) throws Exception {
+		
+        Timestamp timestamp1 = new Timestamp((new Date()).getTime());
+		System.out.println("accessLittlepoProductTracking: started at " + timestamp1);
+        
+		TransactionReceiptProcessor transactionReceiptProcessor = new NoOpProcessor(web3j);
+
+		TransactionManager transactionManager = new FastRawTransactionManager(
+				web3j, 
+				credentials, 
+				ChainId.NONE, 
+				transactionReceiptProcessor); 
+		
+		String addressLittlepoProductTracking = web3Properties.getAddressLittlepoProductTracking();
+
+		System.out.println("accessLittlepoProductTracking: address is " + addressLittlepoProductTracking);
+
+		if (littlepoProductTracking == null) {
+			littlepoProductTracking = littlepoProductTracking.load
+					(addressLittlepoProductTracking, web3j, transactionManager, new DefaultGasProvider()); // use default Transaction Manager
+			Timestamp timestamp2 = new Timestamp((new Date()).getTime());
+
+			System.out.println("accessLittlepoProductTracking: ended at " + timestamp2);
+		}
+		
+	}
+	
 	private void accessRetailShopNode(Credentials credentials) throws Exception {
 		
         Timestamp timestamp1 = new Timestamp((new Date()).getTime());
@@ -712,7 +799,6 @@ public class ContractController extends AbstractContractManager {
 
 			System.out.println("accessRetailShopode: ended at " + timestamp2);
 		}
-		
-	}
+	}	
 
 }
