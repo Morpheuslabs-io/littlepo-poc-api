@@ -10,7 +10,7 @@ import com.littlepo.utils.CommonConstants;
 public class NodeIdata extends NodeData{
 	
 	private String dxQrCodeID;
-	private String dQRcodeID;
+	private String iQRcodeID;
 	private String bBatchNo;
 	private String dBatchNo;
 	private String weight; // e.g. 15000 g
@@ -27,8 +27,8 @@ public class NodeIdata extends NodeData{
 	public String getNodeType() {
 		return CommonConstants.NODE_TYPE_G;
 	}
-	public String getDQrCodeID() {
-		return this.dQRcodeID;
+	public String getIQrCodeID() {
+		return this.iQRcodeID;
 	}
 	public String getDxQrCodeID() {
 		return this.dxQrCodeID;
@@ -62,8 +62,8 @@ public class NodeIdata extends NodeData{
 	}
 	
 	
-	public void setDQrCodeID(String dQRcodeID) {
-		this.dQRcodeID = dQRcodeID;
+	public void setIQrCodeID(String iQRcodeID) {
+		this.iQRcodeID = iQRcodeID;
 	}
 	public void setDxQrCodeID(String dxQrCodeID) {
 		this.dxQrCodeID = dxQrCodeID;

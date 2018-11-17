@@ -87,6 +87,17 @@ public class ProductTrackingService {
 		
 	}
 	
+	public TxHashResponse addTeaBagAtNodeD(NodeDdata nodeDdata, Credentials credentials) throws Exception{
+		
+		// 
+		// call smart contract Update Product Tracking  function
+		ContractController contractController = new ContractController(web3Properties);
+		TxHashResponse txHashResponse = contractController.addTeaBagAtPackNode(nodeDdata, credentials);
+
+		return txHashResponse;
+		
+	}
+	
 	public TxHashResponse productTrackingAtNodeG(NodeGdata nodeGdata, Credentials credentials) throws Exception{
 		
 		// 

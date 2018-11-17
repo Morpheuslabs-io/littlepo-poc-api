@@ -243,7 +243,9 @@ public class ContractController extends AbstractContractManager {
 		
         accessProductPackerNode(credentials);
         
+        Bytes32 dQrCodeID = Web3jUtils.stringToBytes32(nodeDdata.getDQrCodeID());
         Bytes32 dxQrCodeID = Web3jUtils.stringToBytes32(nodeDdata.getDxQrCodeID());
+        Bytes32 bBatchNo = Web3jUtils.stringToBytes32(nodeDdata.getBbatchNo());
         Bytes32 dBatchNo = Web3jUtils.stringToBytes32(nodeDdata.getDbatchNo());
         Bytes32 productName =  Web3jUtils.stringToBytes32(nodeDdata.getProductName());
         Bytes32 location =  Web3jUtils.stringToBytes32(nodeDdata.getLocation());
@@ -255,9 +257,9 @@ public class ContractController extends AbstractContractManager {
         Bytes32 legalEntiry = Web3jUtils.stringToBytes32(nodeDdata.getLegalEntity());
 
         
-        // Teabag arguments
-        // bytes32 _qrCodeId,
-        // bytes32 _dBatchNo,
+        // bytes32 _qrCodeId, (dxQrCodeId)
+        // bytes32 _dBatchNo
+        // bytes32 _bBatchNo,
         // bytes32 _productName,
         // bytes32 _location,
         // bytes32 _productId,
@@ -267,9 +269,9 @@ public class ContractController extends AbstractContractManager {
         // bytes32 _legalEntity
         
         DynamicArray<Bytes32> bArgs = 
-        		new DynamicArray<> (dxQrCodeID, dBatchNo, productName, location, productId, containerId, containerType, legalEntiry, producerId);
+        		new DynamicArray<> (dxQrCodeID, dBatchNo, bBatchNo, productName, location, productId, producerId, containerId, containerType, legalEntiry);
 
-        String txHash = productPackerNode.addTeaBagBatch(dBatchNo, bArgs).send().getTransactionHash();
+        String txHash = productPackerNode.addTeaBagBatch(dQrCodeID, bArgs).send().getTransactionHash();
         Timestamp timestamp3 = new Timestamp((new Date()).getTime());       
 
 
@@ -338,7 +340,7 @@ public class ContractController extends AbstractContractManager {
         Timestamp timestamp1 = new Timestamp((new Date()).getTime());
         accessRetailShopNode(credentials);
         
-        Bytes32 productBatchId = Web3jUtils.stringToBytes32(nodeIdata.getDQrCodeID());
+        Bytes32 iQrCodeID = Web3jUtils.stringToBytes32(nodeIdata.getIQrCodeID());
         Bytes32 dBatchNo = Web3jUtils.stringToBytes32(nodeIdata.getDbatchNo());
         Bytes32 dxQrCodeID = Web3jUtils.stringToBytes32(nodeIdata.getDxQrCodeID());
         Bytes32 bBatchNo = Web3jUtils.stringToBytes32(nodeIdata.getBbatchNo());
@@ -347,30 +349,30 @@ public class ContractController extends AbstractContractManager {
 
         Bytes32 productId = Web3jUtils.stringToBytes32(nodeIdata.getProductID());
         Bytes32 producerId = Web3jUtils.stringToBytes32(nodeIdata.getProducerID());
-        Bytes32 containerId = Web3jUtils.stringToBytes32(nodeIdata.getDQrCodeID());
+        Bytes32 containerId = Web3jUtils.stringToBytes32(nodeIdata.getProductID());
         Bytes32 containerType = Web3jUtils.stringToBytes32(nodeIdata.getPackageType());
         Bytes32 legalEntiry = Web3jUtils.stringToBytes32(nodeIdata.getLegalEntity());
         Bytes32 quantity = Web3jUtils.stringToBytes32(nodeIdata.getQty());
         Bytes32 price = Web3jUtils.stringToBytes32(nodeIdata.getPrice());
         Bytes32 waterTemperature = Web3jUtils.stringToBytes32(nodeIdata.getWaterTemperature());
         
-        // Array format
-        // bytes32 _productBatchId,
-        // bytes32 _dxQRCodeId,
-        // bytes32 _dBatchNo,
-        // bytes32 _bBatchNo,
-        // bytes32 _productName,
-        // bytes32 _location,
-        // bytes32 _productId,
-        // bytes32 _containerId,
-        // bytes32 _containerType,
-        // bytes32 _legalEntity,
-        // bytes32 _producerId,
-        // bytes32 _quantity,
-        // bytes32 _price,
-        // bytes32 _waterTemperature
+        // qrCodeId = bArgs[0];
+        // dxQRCodeId = bArgs[1];
+        // dBatchNo = bArgs[2];
+        // bBatchNo = bArgs[3];
+        // productName = bArgs[4];
+        // location = bArgs[5];
+
+        // productId = bArgs[6];
+        // containerId = bArgs[7];
+        // containerType = bArgs[8];
+        // legalEntity = bArgs[9];
+        // producerId = bArgs[10];
+        // quantity = bArgs[11];
+        // price = bArgs[12];
+        // waterTemperature = bArgs[13];
         
-        DynamicArray<Bytes32> bArgs = new DynamicArray<> (productBatchId, dxQrCodeID, dBatchNo, bBatchNo, productName, location, productId, containerId, containerType, legalEntiry, producerId, quantity, price, waterTemperature);
+        DynamicArray<Bytes32> bArgs = new DynamicArray<> (iQrCodeID, dxQrCodeID, dBatchNo, bBatchNo, productName, location, productId, containerId, containerType, legalEntiry, producerId, quantity, price, waterTemperature);
         
         Timestamp timestamp2 = new Timestamp((new Date()).getTime());
         String txHash = retailShopNode.createProductBatch(bArgs).send().getTransactionHash();
@@ -472,7 +474,7 @@ public class ContractController extends AbstractContractManager {
 		nodeDdata.setPackageType(packageType);
 		nodeDdata.setDQrCodeID(qrCodeID);
 		
-		nodeDdata.setDbatchNo(bBatchNo);
+		nodeDdata.setDbatchNo(dBatchNo);
 		nodeDdata.setWeight(weight);
 		
 		return nodeDdata;
@@ -566,7 +568,7 @@ public class ContractController extends AbstractContractManager {
 		nodeIdata.setLocation(location);
 		nodeIdata.setLegalEntity(legalEntity);
 		nodeIdata.setPackageType(packageType);
-		nodeIdata.setDQrCodeID(qrCodeID);
+		nodeIdata.setIQrCodeID(qrCodeID);
 		
 		nodeIdata.setDbatchNo(bBatchNo);
 		

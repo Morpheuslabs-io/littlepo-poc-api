@@ -92,10 +92,10 @@ public class ProductTrackingAPI {
 			}
 			String dBatchNo = IDGenerator.createDBatchNo(productID);
 			String dQrCodeID = IDGenerator.createDQrCodeID();
-			String dxQrCodeID = IDGenerator.createDxQrCodeID();
+			// String dxQrCodeID = IDGenerator.createDxQrCodeID();
 			nodeDdata1.setDbatchNo(dBatchNo);
 			nodeDdata1.setDQrCodeID(dQrCodeID);
-			nodeDdata1.setDxQrCodeID(dxQrCodeID);
+			// nodeDdata1.setDxQrCodeID(dxQrCodeID);
 			
 			TxHashResponse txHashResponse = productTrackingService.productTrackingAtNodeD(nodeDdata1, credentials);
 			nodeDdata1.setTxHash(txHashResponse.getTxHash());
@@ -105,6 +105,29 @@ public class ProductTrackingAPI {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new InternalServerError("Error while tracking product info", ex);
+		}
+	}
+	
+	@RequestMapping(method = RequestMethod.POST, path = "/tracking/node-d/teabag", produces = "application/json")
+	@ApiOperation(value = "Add tea bag at Node-D of the supply chain process, this will generate dxQrCodeId",
+    notes = "Track product info")
+	public NodeDdata addTeaBagAtNodeD(@RequestBody NodeDdata nodeDdata) {
+		try {
+			NodeDdata nodeDdata1 = nodeDdata;
+			String userID = nodeDdata.getUserID();
+			Credentials credentials = new UserAdmin().getCredentials(userID);
+			
+			String dxQrCodeID = IDGenerator.createDxQrCodeID();
+		    nodeDdata1.setDxQrCodeID(dxQrCodeID);
+			
+			TxHashResponse txHashResponse = productTrackingService.addTeaBagAtNodeD(nodeDdata1, credentials);
+			nodeDdata1.setTxHash(txHashResponse.getTxHash());
+			nodeDdata1.setScAddress(txHashResponse.getContractAddress());
+			return nodeDdata1;
+
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			throw new InternalServerError("Error while adding tea bag", ex);
 		}
 	}
 	
@@ -136,7 +159,11 @@ public class ProductTrackingAPI {
 			NodeIdata nodeIdata1 = nodeIdata;
 			String userID = nodeIdata.getUserID();
 			Credentials credentials = new UserAdmin().getCredentials(userID);
-			TxHashResponse txHashResponse = productTrackingService.productTrackingAtNodeI(nodeIdata, credentials);
+			
+			String iQrCodeID = IDGenerator.createIQrCodeID();
+		    nodeIdata1.setIQrCodeID(iQrCodeID);
+			
+			TxHashResponse txHashResponse = productTrackingService.productTrackingAtNodeI(nodeIdata1, credentials);
 			nodeIdata1.setTxHash(txHashResponse.getTxHash());
 			nodeIdata1.setScAddress(txHashResponse.getContractAddress());
 			return nodeIdata1;
