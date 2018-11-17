@@ -22,10 +22,10 @@ public class NodeIdata extends NodeData{
 	private String waterTemperature;
 	
 	public String getNodeID() {
-		return CommonConstants.NODE_TYPE_G;
+		return CommonConstants.NODE_TYPE_I;
 	}
 	public String getNodeType() {
-		return CommonConstants.NODE_TYPE_G;
+		return CommonConstants.NODE_TYPE_I;
 	}
 	public String getIQrCodeID() {
 		return this.iQRcodeID;

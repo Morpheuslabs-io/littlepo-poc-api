@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.web3j.crypto.Credentials;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.littlepo.data.NodeBdata;
 import com.littlepo.data.NodeData;
 import com.littlepo.data.NodeDdata;
@@ -140,6 +141,9 @@ public class ProductTrackingAPI {
 			String userID = nodeGdata.getUserID();
 			Credentials credentials = new UserAdmin().getCredentials(userID);
 			
+			String gQrCodeID = IDGenerator.createGQrCodeID();
+			nodeGdata1.setGQrCodeID(gQrCodeID);
+			
 			TxHashResponse txHashResponse = productTrackingService.productTrackingAtNodeG(nodeGdata1, credentials);
 			nodeGdata1.setTxHash(txHashResponse.getTxHash());
 			nodeGdata1.setScAddress(txHashResponse.getContractAddress());
@@ -156,7 +160,8 @@ public class ProductTrackingAPI {
     notes = "Track product info")
 	public NodeIdata trackProductAtNodeI(@RequestBody NodeIdata nodeIdata) {
 		try {
-			NodeIdata nodeIdata1 = nodeIdata;
+			NodeIdata nodeIdata1 = nodeIdata;		
+			
 			String userID = nodeIdata.getUserID();
 			Credentials credentials = new UserAdmin().getCredentials(userID);
 			
@@ -238,7 +243,7 @@ public class ProductTrackingAPI {
 		}
 	}
 	
-	
+	/*
     @RequestMapping(method = RequestMethod.GET, path = "/productbatch/batchno", produces = "application/json")
 	@ApiOperation(value = "Get product batch info by product batch no",
     notes = "This gets product batch based on product batch no.")
@@ -254,14 +259,14 @@ public class ProductTrackingAPI {
 			throw new InternalServerError("Error while getting info", ex);
 		}
     }
+    */
     
     @RequestMapping(method = RequestMethod.GET, path = "/productbatch/qrcode", produces = "application/json")
 	@ApiOperation(value = "Get product batch info by QR Code ID",
     notes = "This returns product batch info that is related to the QR code, based on QR code ID.")
 
-    public ProductBatch queryProductBatchByQRcode(@RequestParam QrData qrData) throws Exception {
+    public ProductBatch getProductBatchByQRcode(@RequestParam String qrCodeID) throws Exception {
     	try {
-    		String qrCodeID = qrData.getQrString();
 	    	ProductBatch productBatchInfo = new ProductBatch();
 	    	Credentials credentials = new UserAdmin().getDefaultCredentials();
 	    	productBatchInfo = productTrackingService.getProductBatchInfoByQrCode(qrCodeID, credentials);
@@ -272,6 +277,7 @@ public class ProductTrackingAPI {
 		}
     }
     
+    /*
     @RequestMapping(method = RequestMethod.GET, path = "/id", produces = "application/json")
 	@ApiOperation(value = "Get product info by product ID",
     notes = "This returns product basic info, including list of product batches, based on product ID.")
@@ -287,38 +293,41 @@ public class ProductTrackingAPI {
 			throw new InternalServerError("Error while getting info", ex);
 		}
     }
+    */
     
     @RequestMapping(method = RequestMethod.GET, path = "/trackinghistory", produces = "application/json")
-	@ApiOperation(value = "Get product tracking history by QR code ID of the finished product",
+	@ApiOperation(value = "Get product tracking history (list of Nodes) by QR code ID of the finished product",
     notes = "This returns tracking history.")
 
-    public ProductTrackingHistory getProductTrackingHistory(@RequestParam String qrCodeID) throws Exception {
+    public List<NodeData> getProductTrackingHistory(@RequestParam String qrCodeID) throws Exception {
     	try {
-	    	ProductTrackingHistory productTrackingHistoryInfo = new ProductTrackingHistory();
+	    	List<NodeData> listOfNodeData = new ArrayList<NodeData>();
 	    	Credentials credentials = new UserAdmin().getDefaultCredentials();
-	    	productTrackingHistoryInfo = productTrackingService.getProductTrackingHistory(qrCodeID, credentials);  	    	
-	        return productTrackingHistoryInfo;
+	    	listOfNodeData = productTrackingService.getProductTrackingHistory(qrCodeID, credentials);  	    	
+	        return listOfNodeData;
       	} catch (Exception ex) {
     			ex.printStackTrace();
     			throw new InternalServerError("Error while getting info", ex);
     	}    
     }
     
+    /*
     @RequestMapping(method = RequestMethod.GET, path = "/tracking", produces = "application/json")
-	@ApiOperation(value = "Get product tracking details by Node ID and Product Batch No - bBatchNo",
+	@ApiOperation(value = "Get product tracking details for a tea bag QR code",
     notes = "This returns tracking details at a particular node.")
 
-    public ProductTracking getProductTrackingInfo(@RequestParam String nodeID, String productBatchNo) throws Exception {
+    public ProductBatch getProductTrackingInfo(@RequestParam String nodeID, String dxQrCode) throws Exception {
     	try {
-	    	ProductTracking productTrackingInfo = new ProductTracking();
+	    	ProductBatch productBatch = new ProductBatch();
 	    	Credentials credentials = new UserAdmin().getDefaultCredentials();
-	    	productTrackingInfo = productTrackingService.getProductTracking(nodeID, productBatchNo, credentials);  	    	
+	    	List<ProductBatch> listOfProductBatch = productTrackingService.getProductTracking(nodeID, productBatchNo, credentials);  	    	
 	        return productTrackingInfo;
       	} catch (Exception ex) {
     			ex.printStackTrace();
     			throw new InternalServerError("Error while getting info", ex);
     	} 	        
     }
+    */
 	
 	
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)

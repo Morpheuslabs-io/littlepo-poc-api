@@ -10,6 +10,7 @@ public class IDGenerator {
 	private static AtomicLong dQrCodeIdCounter = new AtomicLong();
 	private static AtomicLong bQrCodeIdCounter = new AtomicLong();
 	private static AtomicLong dxQrCodeIdCounter = new AtomicLong();
+	private static AtomicLong gQrCodeIdCounter = new AtomicLong();
 	private static AtomicLong iQrCodeIdCounter = new AtomicLong();
 	private static String dBatchNoString = "D-" + getDateString();
 	private static String bBatchNoString = "B-" + getDateString();
@@ -38,6 +39,12 @@ public class IDGenerator {
 	{
 		String prefix = getDateTimeString();
 		return String.valueOf("DXQ" + prefix + dxQrCodeIdCounter.getAndIncrement());
+	}
+	
+	public static String createGQrCodeID()
+	{
+		String prefix = getDateTimeString();
+		return String.valueOf("GQ" + prefix + gQrCodeIdCounter.getAndIncrement());
 	}
 	
 	public static String createIQrCodeID()

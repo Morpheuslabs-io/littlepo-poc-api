@@ -10,11 +10,13 @@ import java.util.List;
 
 import org.apache.tomcat.util.codec.binary.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.DynamicArray;
 import org.web3j.abi.datatypes.generated.Bytes32;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.RemoteCall;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tuples.generated.Tuple3;
@@ -23,11 +25,13 @@ import org.web3j.tuples.generated.Tuple8;
 import org.web3j.tx.ChainId;
 import org.web3j.tx.FastRawTransactionManager;
 import org.web3j.tx.TransactionManager;
+import org.web3j.tx.gas.ContractGasProvider;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.tx.response.NoOpProcessor;
 import org.web3j.tx.response.TransactionReceiptProcessor;
 import org.web3j.utils.Numeric;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.littlepo.config.Web3Properties;
 import com.littlepo.data.NodeBdata;
 import com.littlepo.data.NodeData;
@@ -48,7 +52,7 @@ import com.littlepo.web3j.wrapper.LittlepoProductTracking;
 import com.littlepo.web3j.wrapper.ProductHarvesterNode;
 import com.littlepo.web3j.wrapper.ProductPackerNode;
 import com.littlepo.web3j.wrapper.RetailShopNode;
-
+import com.littlepo.web3j.wrapper.TeaBag;
 
 import java.sql.Timestamp;
 
@@ -289,36 +293,22 @@ public class ContractController extends AbstractContractManager {
         Timestamp timestamp1 = new Timestamp((new Date()).getTime());
         accessLittlepoNode(credentials);
         
-        Bytes32 productBatchId = Web3jUtils.stringToBytes32(nodeGdata.getDQrCodeID());
-        Bytes32 dBatchNo = Web3jUtils.stringToBytes32(nodeGdata.getDbatchNo());
-        Bytes32 bBatchNo = Web3jUtils.stringToBytes32(nodeGdata.getBbatchNo());
-        Bytes32 productName =  Web3jUtils.stringToBytes32(nodeGdata.getProductName());
+        Bytes32 dQrCodeId = Web3jUtils.stringToBytes32(nodeGdata.getDQrCodeID());
+        Bytes32 gQrCodeId = Web3jUtils.stringToBytes32(nodeGdata.getGQrCodeID());
         Bytes32 location =  Web3jUtils.stringToBytes32(nodeGdata.getLocation());
-
-        Bytes32 productId = Web3jUtils.stringToBytes32(nodeGdata.getProductID());
         Bytes32 producerId = Web3jUtils.stringToBytes32(nodeGdata.getProducerID());
-        Bytes32 containerId = Web3jUtils.stringToBytes32(nodeGdata.getDQrCodeID());
-        Bytes32 containerType = Web3jUtils.stringToBytes32(nodeGdata.getPackageType());
-        Bytes32 legalEntiry = Web3jUtils.stringToBytes32(nodeGdata.getLegalEntity());
         Bytes32 weight = Web3jUtils.stringToBytes32(nodeGdata.getWeight());
         
         // Array format
-        // bytes32 _productBatchId,
-        // bytes32 _dBatchNo,
-        // bytes32 _bBatchNo,
-        // bytes32 _productName,
+        // bytes32 _rQrCodeId,
         // bytes32 _location,
-        // bytes32 _productId,
-        // bytes32 _containerId,
-        // bytes32 _containerType,
-        // bytes32 _legalEntity,
         // bytes32 _producerId,
         // bytes32 _weight
         
-        DynamicArray<Bytes32> bArgs = new DynamicArray<> (productBatchId, dBatchNo, bBatchNo, productName, location, productId, containerId, containerType, legalEntiry, producerId, weight);
+        DynamicArray<Bytes32> bArgs = new DynamicArray<> (gQrCodeId, location, producerId, weight);
         
         Timestamp timestamp2 = new Timestamp((new Date()).getTime());
-        String txHash = littlepoNode.createProductBatch(bArgs).send().getTransactionHash();
+        String txHash = littlepoNode.receiveProductBatch(dQrCodeId, bArgs).send().getTransactionHash();
         Timestamp timestamp3 = new Timestamp((new Date()).getTime());       
 
 		System.out.println("trackLittlepoNode, create smart contract started at: " + timestamp1);
@@ -339,6 +329,10 @@ public class ContractController extends AbstractContractManager {
 		
         Timestamp timestamp1 = new Timestamp((new Date()).getTime());
         accessRetailShopNode(credentials);
+        
+		// print the JSON string
+		ObjectMapper mapper = new ObjectMapper();
+		System.out.println("JSON: " + mapper.writeValueAsString(nodeIdata));
         
         Bytes32 iQrCodeID = Web3jUtils.stringToBytes32(nodeIdata.getIQrCodeID());
         Bytes32 dBatchNo = Web3jUtils.stringToBytes32(nodeIdata.getDbatchNo());
@@ -372,7 +366,9 @@ public class ContractController extends AbstractContractManager {
         // price = bArgs[12];
         // waterTemperature = bArgs[13];
         
-        DynamicArray<Bytes32> bArgs = new DynamicArray<> (iQrCodeID, dxQrCodeID, dBatchNo, bBatchNo, productName, location, productId, containerId, containerType, legalEntiry, producerId, quantity, price, waterTemperature);
+        DynamicArray<Bytes32> bArgs = 
+        		new DynamicArray<> (iQrCodeID, dxQrCodeID, dBatchNo, bBatchNo, productName, location, 
+        				productId, containerId, containerType, legalEntiry, producerId, quantity, price, waterTemperature);
         
         Timestamp timestamp2 = new Timestamp((new Date()).getTime());
         String txHash = retailShopNode.createProductBatch(bArgs).send().getTransactionHash();
@@ -593,9 +589,9 @@ public class ContractController extends AbstractContractManager {
 		
         ProductBatch productBatch = new ProductBatch();
    
-        Bytes32 qrCodeIDByte32 = Web3jUtils.stringToBytes32(qrCodeID);
-        accessProductHarvesterNode(credentials);
-		DynamicArray<Bytes32> productHarvesterBatch = productHarvesterNode.getProductBatchInfo(qrCodeIDByte32).sendAsync().get();
+        Bytes32 qrCodeBytes32 = Web3jUtils.stringToBytes32(qrCodeID);
+        accessLittlepoProductHistory(credentials);
+		DynamicArray<Bytes32> productBatch1 = littlepoProductHistory.getProductBatchByQR(qrCodeBytes32).send();
        // bBatchNo
        // productName
        // location
@@ -604,21 +600,26 @@ public class ContractController extends AbstractContractManager {
        // containerId
        // containerType
        // legalEntity
-		List<Bytes32> productHarvesterBatchValue = productHarvesterBatch.getValue();
 
-		String productBatchNo = Web3jUtils.hexToASCII(new String(productHarvesterBatchValue.get(0).getValue()));
-		String productName = new String(productHarvesterBatchValue.get(1).getValue(), StandardCharsets.UTF_8);
-		String location = new String(productHarvesterBatchValue.get(2).getValue());
-		String productID = new String(productHarvesterBatchValue.get(3).getValue());
-		String producerID = new String(productHarvesterBatchValue.get(4).getValue());
-		String containerId = new String(productHarvesterBatchValue.get(5).getValue());
-		String containerType = new String(productHarvesterBatchValue.get(6).getValue());
-		String legalEntity = new String(productHarvesterBatchValue.get(7).getValue());	
+		List<Bytes32> productBatch1Value = productBatch1.getValue();
+
+		String bBatchNo = Web3jUtils.hexToASCII(new String(productBatch1Value.get(0).getValue()));
+		String productName = new String(productBatch1Value.get(1).getValue(), StandardCharsets.UTF_8);
+		String location = new String(productBatch1Value.get(2).getValue());
+		String productID = new String(productBatch1Value.get(3).getValue());
+		String producerID = new String(productBatch1Value.get(4).getValue());
+		String packageID = new String(productBatch1Value.get(5).getValue());
+		String packageType = new String(productBatch1Value.get(6).getValue());
+		String legalEntity = new String(productBatch1Value.get(7).getValue());	
 		
-		productBatch.setProductBatchNo(productBatchNo);
-		productBatch.setProductID(productID);
+		productBatch.setProductBatchNo(bBatchNo);
 		productBatch.setProductName(productName);
+		productBatch.setLocation(location);
+		productBatch.setProductID(productID);
 		productBatch.setProducerID(producerID);
+		productBatch.setPackageID(packageID);
+		productBatch.setPackageType(packageType);
+		productBatch.setLegalEntity(legalEntity);
 		
 		return productBatch;
 		
@@ -634,45 +635,50 @@ public class ContractController extends AbstractContractManager {
 		
 	}
 	
-	public ProductTrackingHistory getProductTrackingHistory(String qrCodeID, Credentials credentials) throws Exception {
+	public List<NodeData> getLittlepoProductHistory(String qrCodeID, Credentials credentials) throws Exception {
 		// dxQrCode
-        
-        ProductTrackingHistory productTrackingHistory = new ProductTrackingHistory();
         
         List<NodeData> listOfNodeData = new ArrayList<NodeData> ();
         
-		accessLittlepoProductTracking(credentials);
+		accessLittlepoProductHistory(credentials);
 		
-		// nodeID, qrCodeID, timestamp
+		// get teaBag
 		
-		Tuple3<DynamicArray<Bytes32>, DynamicArray<Bytes32>, DynamicArray<Uint256>> result 
-			= littlepoProductTracking.getProductTrackingInfo(Web3jUtils.stringToBytes32(qrCodeID)).send();
+		Address addressTeaBagContract 
+			= littlepoProductHistory.getBaseProducByQR(Web3jUtils.stringToBytes32(qrCodeID)).send();
 		
-		List<Bytes32> nodeIDs = result.getValue1().getValue();
-		List<Bytes32>  qrCodeIDs = result.getValue2().getValue();
-		List<Uint256>  createTimes = result.getValue3().getValue();
+		TransactionReceiptProcessor transactionReceiptProcessor = new NoOpProcessor(web3j);
+
+		TransactionManager transactionManager = new FastRawTransactionManager(
+				web3j, 
+				credentials, 
+				ChainId.NONE, 
+				transactionReceiptProcessor);
 		
-        NodeIdata nodeIdata = queryRetailShopNode(qrCodeID, credentials);
+		TeaBag teaBag = TeaBag.load(addressTeaBagContract.getValue(), web3j, transactionManager, new DefaultGasProvider());
 		
-		int cnt = nodeIDs.size();
+		Tuple3<DynamicArray<Bytes32>, DynamicArray<Bytes32>, DynamicArray<Uint256>> result = teaBag.getHistory().send();
+		
+		List<Bytes32> bytes32NodeIDs = result.getValue1().getValue();
+		List<Bytes32> bytes32QrCodeIDs = result.getValue2().getValue();	
+		List<Uint256> uint256Time = result.getValue3().getValue();
+		
+		int cnt = bytes32NodeIDs.size();
 		
 		for (int i = 0; i < cnt; i++) {
 			NodeData nodeData = new NodeData();
-			String nodeID = Web3jUtils.removePadding(new String(nodeIDs.get(i).getValue()));
-			String qrCodeID1 = Web3jUtils.removePadding(new String(qrCodeIDs.get(i).getValue()));
-			String createTime = createTimes.get(i).getValue().toString(i);
+			String nodeID = Web3jUtils.removePadding(new String(bytes32NodeIDs.get(i).getValue()));
+			String qrCodeID1 = Web3jUtils.removePadding(new String(bytes32QrCodeIDs.get(i).getValue()));
+			String createTime = Web3jUtils.convertUnixTimestamp(uint256Time.get(i).getValue()).toString();
 			
 			nodeData.setNodeID(nodeID);
-			nodeData.setNodeID(qrCodeID1);
+			nodeData.setQrCodeID(qrCodeID1);
 			nodeData.setCreateTime(createTime);
 			listOfNodeData.add(nodeData);
 
 		}
 		
-		productTrackingHistory.setListOfNodes(listOfNodeData);
-		productTrackingHistory.setProductID(nodeIdata.getProducerID());
-		
-		return productTrackingHistory;
+		return listOfNodeData;
 		
 	}
 	
@@ -775,7 +781,7 @@ public class ContractController extends AbstractContractManager {
 		}
 		
 	}
-	private void accessLittlepoProductTrackingHistory(Credentials credentials) throws Exception {
+	private void accessLittlepoProductHistory(Credentials credentials) throws Exception {
 		
         Timestamp timestamp1 = new Timestamp((new Date()).getTime());
 		System.out.println("accessLittlepoProductHistory: started at " + timestamp1);
@@ -788,37 +794,16 @@ public class ContractController extends AbstractContractManager {
 				ChainId.NONE, 
 				transactionReceiptProcessor); 
 		
-		String addressLittlepoProductHistory = web3Properties.getAddressLittlepoProductTrackingHistory();
+		String addressLittlepoProductHistory = web3Properties.getAddressLittlepoProductHistory();
 
 		System.out.println("accessLittlepoProductHistory: address is " + addressLittlepoProductHistory);
 
 		if (littlepoProductHistory == null) {
-			littlepoProductHistory = littlepoProductHistory.load
+			littlepoProductHistory = LittlepoProductHistory.load
 					(addressLittlepoProductHistory, web3j, transactionManager, new DefaultGasProvider()); // use default Transaction Manager
 			Timestamp timestamp2 = new Timestamp((new Date()).getTime());
 
 			System.out.println("accessLittlepoProductHistory: ended at " + timestamp2);
-		}
-		
-	}
-	
-	private void accessLittlepoProductTracking(Credentials credentials) throws Exception {
-		
-        
-		TransactionReceiptProcessor transactionReceiptProcessor = new NoOpProcessor(web3j);
-
-		TransactionManager transactionManager = new FastRawTransactionManager(
-				web3j, 
-				credentials, 
-				ChainId.NONE, 
-				transactionReceiptProcessor); 
-		
-		String addressLittlepoProductTracking = web3Properties.getAddressLittlepoProductTrackingHistory();
-
-		if (littlepoProductTracking == null) {
-			littlepoProductTracking = littlepoProductTracking.load
-					(addressLittlepoProductTracking, web3j, transactionManager, new DefaultGasProvider()); // use default Transaction Manager
-
 		}
 		
 	}
@@ -841,10 +826,12 @@ public class ContractController extends AbstractContractManager {
 		String addressRetailShopNode = web3Properties.getAddressRetailShopNode();
 
 		System.out.println("accessRetailShopNode: address is " + addressRetailShopNode);
+		
+		ContractGasProvider gasProvider = new DefaultGasProvider();
 
 		if (retailShopNode == null) {
 			retailShopNode = RetailShopNode.load
-					(addressRetailShopNode, web3j, transactionManager, new DefaultGasProvider()); // use default Transaction Manager
+					(addressRetailShopNode, web3j, transactionManager, Web3jConstants.GAS_PRICE, Web3jConstants.GAS_LIMIT_TX); // use default Transaction Manager
 			Timestamp timestamp2 = new Timestamp((new Date()).getTime());
 
 			System.out.println("accessRetailShopode: ended at " + timestamp2);

@@ -17,6 +17,7 @@ public class ProductBatch{
 	private String packageID;
 	private String packageType;
 	private String creationTime;
+	private String legalEntity;
 	private int qty;
 	private List<String> listOfQrCodeIds;
 	
@@ -46,6 +47,9 @@ public class ProductBatch{
 	}
 	public String getPackageType() {
 		return this.packageType;
+	}
+	public String getLegalEntity() {
+		return this.legalEntity;
 	}
 	public List<String> getListOfQrCodeIds () {
 		return this.listOfQrCodeIds;
@@ -77,7 +81,9 @@ public class ProductBatch{
 	public void setPackageType (String packageType) {
 		this.packageID = packageType;
 	}
-	
+	public void setLegalEntity (String legalEntity) {
+		this.legalEntity = legalEntity;
+	}
 	// product serial number = QR code ID
 	public void setListOfQrCodeIds (List<String> listOfQrCodeIds) {
 		this.listOfQrCodeIds = listOfQrCodeIds;

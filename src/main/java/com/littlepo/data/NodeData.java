@@ -11,6 +11,7 @@ public class NodeData {
 	private String userID;
 	private String legalEntity;
 	private String createTime;
+	private String qrCodeID;
 	private String productID;
 	private String productName;
 	private String txHash;
@@ -30,6 +31,9 @@ public class NodeData {
 	}
 	public void setCreateTime(String createTime) {
 		this.createTime = createTime;
+	}
+	public void setQrCodeID(String qrCodeID) {
+		this.qrCodeID = qrCodeID;
 	}
 	public void setProductID(String productID) {
 		this.productID = productID;
@@ -58,6 +62,9 @@ public class NodeData {
 	}
 	public String getCreateTime() {
 		return this.createTime;
+	}
+	public String getQrCodeID() {
+		return this.qrCodeID;
 	}
 	public String getProductID() {
 		return this.productID;

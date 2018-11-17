@@ -9,6 +9,7 @@ import com.littlepo.utils.CommonConstants;
 @JsonInclude(Include.NON_NULL)
 public class NodeGdata extends NodeData{
 	
+	private String gQRcodeID;
 	private String dxQrCodeID;
 	private String dQRcodeID;
 	private String bBatchNo;
@@ -23,6 +24,9 @@ public class NodeGdata extends NodeData{
 	}
 	public String getNodeType() {
 		return CommonConstants.NODE_TYPE_G;
+	}
+	public String getGQrCodeID() {
+		return this.gQRcodeID;
 	}
 	public String getDQrCodeID() {
 		return this.dQRcodeID;
@@ -52,6 +56,9 @@ public class NodeGdata extends NodeData{
 	
 	public void setDQrCodeID(String dQRcodeID) {
 		this.dQRcodeID = dQRcodeID;
+	}
+	public void setGQrCodeID(String gQRcodeID) {
+		this.gQRcodeID = gQRcodeID;
 	}
 	public void setDxQrCodeID(String dxQrCodeID) {
 		this.dxQrCodeID = dxQrCodeID;

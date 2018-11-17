@@ -1,7 +1,9 @@
 package com.littlepo.service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -120,36 +122,43 @@ public class ProductTrackingService {
 		
 	}
 
-	
+	/*
 	public Product getProductInfoByProductID (String productID, Credentials credentials) {
 		// get Product Info by product ID function
 		Product product = new Product();
 		return product;
 	}
+	*/
 	
-	public ProductBatch getProductBatchInfoByBatchNo (String productBatchNo, Credentials credentials) {
+	/*
+	public ProductBatch getProductBatchInfoByBatchNo (String bacthNo, Credentials credentials) {
 		// get Product Info by product Batch Number
 		ProductBatch productBatch = new ProductBatch();
+
 		return productBatch;
 	}
+	*/
 	
-	public ProductBatch getProductBatchInfoByQrCode (String qrCodeID, Credentials credentials) {
-		// get Product Batch Info by QR code ID
+	public ProductBatch getProductBatchInfoByQrCode (String qrCodeID, Credentials credentials) throws Exception {
+		// get Product Batch Info by QR code ID (dxCodeID)
 		ProductBatch productBatch = new ProductBatch();
+		ContractController contractController = new ContractController();
+		productBatch = contractController.getProductBatchInfoByQrCodeID(qrCodeID, credentials);
 		return productBatch;
 	}
 	
-	public ProductTrackingHistory getProductTrackingHistory (String qrCodeID, Credentials credentials) throws Exception {
+	public List<NodeData> getProductTrackingHistory (String qrCodeID, Credentials credentials) throws Exception {
 		
 		// call query product tracking history info function in the smart contract
 		
-		ProductTrackingHistory productTrackingHistory = new ProductTrackingHistory();
+		List<NodeData> listOfNodeData = new ArrayList<NodeData>();
 		ContractController contractController = new ContractController(web3Properties);
-		productTrackingHistory = contractController.getProductTrackingHistory(qrCodeID, credentials);
-		return productTrackingHistory;
+		listOfNodeData = contractController.getLittlepoProductHistory(qrCodeID, credentials);
+		return listOfNodeData;
 		
 	}
-	public ProductTracking getProductTracking (String NodeID, String productBatchNo, Credentials credentials) {
+	/*
+	public ProductTracking getProductTracking (String NodeID, String productBatchNo, Credentials credentials) throws Exception{
 		
 		// call query product tracking info function in the smart contract. productBatchNo refer to bBatchNo since it is global across all the nodes.
 		
@@ -157,6 +166,6 @@ public class ProductTrackingService {
 		return productTracking;
 		
 	}
-	
+	*/
 
 }
