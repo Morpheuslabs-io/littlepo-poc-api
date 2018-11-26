@@ -1,14 +1,12 @@
 package com.littlepo.web3j;
 
-import java.math.BigDecimal;
-import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.tomcat.util.codec.binary.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.web3j.abi.datatypes.Address;
 import org.web3j.abi.datatypes.DynamicArray;
@@ -16,12 +14,8 @@ import org.web3j.abi.datatypes.generated.Bytes32;
 import org.web3j.abi.datatypes.generated.Uint256;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
-import org.web3j.protocol.core.RemoteCall;
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tuples.generated.Tuple3;
-import org.web3j.tuples.generated.Tuple7;
-import org.web3j.tuples.generated.Tuple8;
 import org.web3j.tx.ChainId;
 import org.web3j.tx.FastRawTransactionManager;
 import org.web3j.tx.TransactionManager;
@@ -29,7 +23,6 @@ import org.web3j.tx.gas.ContractGasProvider;
 import org.web3j.tx.gas.DefaultGasProvider;
 import org.web3j.tx.response.NoOpProcessor;
 import org.web3j.tx.response.TransactionReceiptProcessor;
-import org.web3j.utils.Numeric;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.littlepo.config.Web3Properties;
@@ -40,10 +33,7 @@ import com.littlepo.data.NodeGdata;
 import com.littlepo.data.NodeIdata;
 import com.littlepo.data.Product;
 import com.littlepo.data.ProductBatch;
-import com.littlepo.data.ProductTracking;
-import com.littlepo.data.ProductTrackingHistory;
 import com.littlepo.data.blockchain.TxHashResponse;
-import com.littlepo.utils.Orchard;
 import com.littlepo.utils.Web3jConstants;
 import com.littlepo.utils.Web3jUtils;
 import com.littlepo.web3j.wrapper.LittlepoNode;
@@ -56,15 +46,14 @@ import com.littlepo.web3j.wrapper.TeaBag;
 
 import java.sql.Timestamp;
 
-import static org.web3j.tx.TransactionManager.DEFAULT_POLLING_ATTEMPTS_PER_TX_HASH;
-import org.web3j.tx.response.Callback;
-
-
 /**
  * Sample application to demonstrate smart contract deployment
  * and usage with the web3j library. 
  */
 public class ContractController extends AbstractContractManager {
+	private static final Logger log = LoggerFactory.getLogger(ContractController.class);
+	private static final ObjectMapper MAPPER = new ObjectMapper();
+	
 	
 	private static final long POLLING_FREQUENCY = 15000;
 	private Web3Properties web3Properties = new Web3Properties();
@@ -97,7 +86,8 @@ public class ContractController extends AbstractContractManager {
 		System.out.println("ContractController: clientUrl " + clientUrl);
 		web3j = Web3j.build(new HttpService(clientUrl));
 	}
-	public TxHashResponse createProduct(Product profuct, Credentials credentials) throws Exception {
+	public TxHashResponse createProduct(Product product, Credentials credentials) throws Exception {
+		log.info("Create product request '{}'", MAPPER.writeValueAsString(product));
 		
         Timestamp timestamp1 = new Timestamp((new Date()).getTime());
 
@@ -120,24 +110,23 @@ public class ContractController extends AbstractContractManager {
 		
 	}
 	
-	public TxHashResponse createProductBatch(ProductBatch profuctBatch, Credentials credentials) throws Exception {
+	public TxHashResponse createProductBatch(ProductBatch productBatch, Credentials credentials) throws Exception {
+		log.info("Create product batch request '{}'", MAPPER.writeValueAsString(productBatch));
 		
-        Timestamp timestamp1 = new Timestamp((new Date()).getTime());
-
-        Timestamp timestamp2 = new Timestamp((new Date()).getTime());
+        Timestamp timestamp1 = new Timestamp(System.currentTimeMillis());
+        Timestamp timestamp2 = new Timestamp(System.currentTimeMillis());
         // String txHash = productHarvesterNode.createProductBatch(bArgs).send().getTransactionHash();
         // productHarvesterNode.createProductBatch(bArgs).sendAsync();
-        Timestamp timestamp3 = new Timestamp((new Date()).getTime());       
+        Timestamp timestamp3 = new Timestamp(System.currentTimeMillis());
 
-		System.out.println("createProductBatch, create smart contract started at: " + timestamp1);
-		System.out.println("createProductBatch, call smart contract started: " + timestamp2);
-		System.out.println("createProductBatch, ended at: " + timestamp3);
-		// System.out.println("createProductBatch, txTash: " + txHash);
-		
+        log.info("createProductBatch, create smart contract started at: " + timestamp1);
+        log.info("createProductBatch, call smart contract started: " + timestamp2);
+        
 		TxHashResponse txHashResponse = new TxHashResponse();
 		// txHashResponse.setTxHash(txHash);
 		txHashResponse.setContractAddress(productHarvesterNode.getContractAddress());
 		txHashResponse.setSubmiitedTime(timestamp3);
+		log.info("createProductBatch, ended at: " + timestamp3);
 		
 		return txHashResponse;
 		
@@ -145,6 +134,7 @@ public class ContractController extends AbstractContractManager {
 	
 	public TxHashResponse trackProductAtHarvesterNode(NodeBdata nodeBdata, Credentials credentials) throws Exception {
 		
+		log.info("REQUEST tracking at harvester node '{}'", MAPPER.writeValueAsString(nodeBdata));
         Timestamp timestamp1 = new Timestamp((new Date()).getTime());
         accessProductHarvesterNode(credentials);
         
@@ -177,10 +167,10 @@ public class ContractController extends AbstractContractManager {
         // productHarvesterNode.createProductBatch(bArgs).sendAsync();
         Timestamp timestamp3 = new Timestamp((new Date()).getTime());       
 
-		System.out.println("trackProductAtHarvesterNode, create smart contract started at: " + timestamp1);
-		System.out.println("trackProductAtHarvesterNode, call smart contract started: " + timestamp2);
-		System.out.println("trackProductAtHarvesterNode, ended at: " + timestamp3);
-		System.out.println("trackProductAtHarvesterNode, txTash: " + txHash);
+        log.info("trackProductAtHarvesterNode, create smart contract started at: {}", timestamp1);
+        log.info("trackProductAtHarvesterNode, call smart contract started: {}", timestamp2);
+        log.info("trackProductAtHarvesterNode, ended at: {}", timestamp3);
+        log.info("trackProductAtHarvesterNode, txTash: {}", txHash);
 		
 		TxHashResponse txHashResponse = new TxHashResponse();
 		txHashResponse.setTxHash(txHash);
@@ -192,6 +182,7 @@ public class ContractController extends AbstractContractManager {
 	}
 	
 	public TxHashResponse trackProductAtPackerNode(NodeDdata nodeDdata, Credentials credentials) throws Exception {
+		log.info("request tracking bat packer node '{}'", MAPPER.writeValueAsString(nodeDdata));
 		
         Timestamp timestamp1 = new Timestamp((new Date()).getTime());
         accessProductPackerNode(credentials);
@@ -229,10 +220,10 @@ public class ContractController extends AbstractContractManager {
         String txHash = productPackerNode.createProductBatch(bArgs).send().getTransactionHash();
         Timestamp timestamp3 = new Timestamp((new Date()).getTime());       
 
-		System.out.println("trackProductAtPackerNode, create smart contract started at: " + timestamp1);
-		System.out.println("trackProductAtPackerNode, call smart contract started: " + timestamp2);
-		System.out.println("trackProductAtPackerNode, ended at: " + timestamp3);
-		System.out.println("trackProductAtPackerNode, txTash: " + txHash);
+        log.info("trackProductAtPackerNode, create smart contract started at: {}", timestamp1);
+        log.info("trackProductAtPackerNode, call smart contract started: {}", timestamp2);
+        log.info("trackProductAtPackerNode, ended at: {}", timestamp3);
+        log.info("trackProductAtPackerNode, txTash: {}", txHash);
 		
 		TxHashResponse txHashResponse = new TxHashResponse();
 		txHashResponse.setTxHash(txHash);
@@ -243,7 +234,7 @@ public class ContractController extends AbstractContractManager {
 		
 	}
 	
-		public TxHashResponse addTeaBagAtPackNode(NodeDdata nodeDdata, Credentials credentials) throws Exception {
+	public TxHashResponse addTeaBagAtPackNode(NodeDdata nodeDdata, Credentials credentials) throws Exception {
 		
         accessProductPackerNode(credentials);
         
@@ -289,6 +280,7 @@ public class ContractController extends AbstractContractManager {
 	}
 
 	public TxHashResponse trackLittlepoNode(NodeGdata nodeGdata, Credentials credentials) throws Exception {
+		log.info("Request tracking at node G '{}'", MAPPER.writeValueAsString(nodeGdata));
 		
         Timestamp timestamp1 = new Timestamp((new Date()).getTime());
         accessLittlepoNode(credentials);
@@ -311,10 +303,10 @@ public class ContractController extends AbstractContractManager {
         String txHash = littlepoNode.receiveProductBatch(dQrCodeId, bArgs).send().getTransactionHash();
         Timestamp timestamp3 = new Timestamp((new Date()).getTime());       
 
-		System.out.println("trackLittlepoNode, create smart contract started at: " + timestamp1);
-		System.out.println("trackLittlepoNode, call smart contract started: " + timestamp2);
-		System.out.println("trackLittlepoNode, ended at: " + timestamp3);
-		System.out.println("trackLittlepoNode, txTash: " + txHash);
+        log.info("trackLittlepoNode, create smart contract started at: {}", timestamp1);
+        log.info("trackLittlepoNode, call smart contract started: {}", timestamp2);
+        log.info("trackLittlepoNode, ended at: {}", timestamp3);
+        log.info("trackLittlepoNode, txTash: {}", txHash);
 		
 		TxHashResponse txHashResponse = new TxHashResponse();
 		txHashResponse.setTxHash(txHash);
@@ -326,13 +318,12 @@ public class ContractController extends AbstractContractManager {
 	}
 	
 	public TxHashResponse trackRetailShopNode(NodeIdata nodeIdata, Credentials credentials) throws Exception {
-		
+		log.info("Request tracking at node I '{}'", MAPPER.writeValueAsString(nodeIdata));
         Timestamp timestamp1 = new Timestamp((new Date()).getTime());
         accessRetailShopNode(credentials);
         
 		// print the JSON string
 		ObjectMapper mapper = new ObjectMapper();
-		System.out.println("JSON: " + mapper.writeValueAsString(nodeIdata));
         
         Bytes32 iQrCodeID = Web3jUtils.stringToBytes32(nodeIdata.getIQrCodeID());
         Bytes32 dBatchNo = Web3jUtils.stringToBytes32(nodeIdata.getDbatchNo());
@@ -374,10 +365,10 @@ public class ContractController extends AbstractContractManager {
         String txHash = retailShopNode.createProductBatch(bArgs).send().getTransactionHash();
         Timestamp timestamp3 = new Timestamp((new Date()).getTime());       
 
-		System.out.println("trackRetailShopNode, create smart contract started at: " + timestamp1);
-		System.out.println("trackRetailShopNode, call smart contract started: " + timestamp2);
-		System.out.println("trackRetailShopNode, ended at: " + timestamp3);
-		System.out.println("trackRetailShopNode, txTash: " + txHash);
+        log.info("trackRetailShopNode, create smart contract started at: {}", timestamp1);
+        log.info("trackRetailShopNode, call smart contract started: {}",  timestamp2);
+        log.info("trackRetailShopNode, ended at: {}", timestamp3);
+        log.info("trackRetailShopNode, txTash: {}",  txHash);
 		
 		TxHashResponse txHashResponse = new TxHashResponse();
 		txHashResponse.setTxHash(txHash);
@@ -578,8 +569,6 @@ public class ContractController extends AbstractContractManager {
         ProductBatch productBatch = new ProductBatch();
         
 		accessRetailShopNode(credentials);
-		
-		
 		
 		return productBatch;
 		

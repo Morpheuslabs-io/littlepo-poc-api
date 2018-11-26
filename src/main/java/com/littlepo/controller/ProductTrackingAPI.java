@@ -2,15 +2,12 @@ package com.littlepo.controller;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,25 +22,20 @@ import com.littlepo.data.NodeData;
 import com.littlepo.data.NodeDdata;
 import com.littlepo.data.NodeGdata;
 import com.littlepo.data.NodeIdata;
-import com.littlepo.data.Product;
 import com.littlepo.data.ProductBatch;
-import com.littlepo.data.ProductTracking;
-import com.littlepo.data.ProductTrackingHistory;
-import com.littlepo.data.QrData;
 import com.littlepo.data.blockchain.TxHashResponse;
 import com.littlepo.service.ProductTrackingService;
 import com.littlepo.utils.IDGenerator;
 import com.littlepo.utils.UserAdmin;
-import com.littlepo.web3j.ContractController;
 
-import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 
 @RestController
 @RequestMapping("/api/product/")
-
 public class ProductTrackingAPI {
-
+	private static final ObjectMapper MAPPER = new ObjectMapper();
+	private static final Logger log = LoggerFactory.getLogger(ProductTrackingAPI.class);
+	
     @Autowired
 	ProductTrackingService productTrackingService;
     
@@ -52,6 +44,8 @@ public class ProductTrackingAPI {
     notes = "Track product info")
 	public NodeBdata trackProductAtNodeB(@RequestBody NodeBdata nodeBdata) {
 		try {
+			log.info("Tracking at node B request {}",MAPPER.writeValueAsString(nodeBdata));
+			
 			NodeBdata nodeBdata1 = nodeBdata;
 			
 			String userID = nodeBdata.getUserID();
@@ -70,10 +64,9 @@ public class ProductTrackingAPI {
 			nodeBdata1.setTxHash(txHashResponse.getTxHash());
 			nodeBdata1.setScAddress(txHashResponse.getContractAddress());
 			return nodeBdata1;
-			
 
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.info("There is error in creating tracking at node B", ex);
 			throw new InternalServerError("Error while tracking product info", ex);
 		}
 	}
@@ -83,6 +76,8 @@ public class ProductTrackingAPI {
     notes = "Track product info")
 	public NodeDdata trackProductAtNodeD(@RequestBody NodeDdata nodeDdata) {
 		try {
+			log.info("Tracking at node D request {}", MAPPER.writeValueAsString(nodeDdata));
+			
 			NodeDdata nodeDdata1 = nodeDdata;
 			String userID = nodeDdata.getUserID();
 			Credentials credentials = new UserAdmin().getCredentials(userID);
@@ -104,7 +99,7 @@ public class ProductTrackingAPI {
 			return nodeDdata1;
 
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.info("There is error in creating tracking at node D", ex);
 			throw new InternalServerError("Error while tracking product info", ex);
 		}
 	}
@@ -114,6 +109,8 @@ public class ProductTrackingAPI {
     notes = "Track product info")
 	public NodeDdata addTeaBagAtNodeD(@RequestBody NodeDdata nodeDdata) {
 		try {
+			log.info("add Teabag at node D request {}", MAPPER.writeValueAsString(nodeDdata));
+			
 			NodeDdata nodeDdata1 = nodeDdata;
 			String userID = nodeDdata.getUserID();
 			Credentials credentials = new UserAdmin().getCredentials(userID);
@@ -127,7 +124,7 @@ public class ProductTrackingAPI {
 			return nodeDdata1;
 
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.info("There is error in creating tracking at node D", ex);
 			throw new InternalServerError("Error while adding tea bag", ex);
 		}
 	}
@@ -137,6 +134,7 @@ public class ProductTrackingAPI {
     notes = "Track product info")
 	public NodeGdata trackProductAtNodeG(@RequestBody NodeGdata nodeGdata) {
 		try {
+			log.info("Tracking product at node G request {}", MAPPER.writeValueAsString(nodeGdata));
 			NodeGdata nodeGdata1 = nodeGdata;
 			String userID = nodeGdata.getUserID();
 			Credentials credentials = new UserAdmin().getCredentials(userID);
@@ -150,7 +148,7 @@ public class ProductTrackingAPI {
 			return nodeGdata1;
 
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.info("There is error in creating tracking at node G", ex);
 			throw new InternalServerError("Error while tracking product info", ex);
 		}
 	}
@@ -160,6 +158,7 @@ public class ProductTrackingAPI {
     notes = "Track product info")
 	public NodeIdata trackProductAtNodeI(@RequestBody NodeIdata nodeIdata) {
 		try {
+			log.info("Tracking product at node I request {}", MAPPER.writeValueAsString(nodeIdata));
 			NodeIdata nodeIdata1 = nodeIdata;		
 			
 			String userID = nodeIdata.getUserID();
@@ -174,7 +173,7 @@ public class ProductTrackingAPI {
 			return nodeIdata1;
 
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.info("There is error in creating tracking at node I", ex);
 			throw new InternalServerError("Error while tracking product info", ex);
 		}
 	}
@@ -183,12 +182,16 @@ public class ProductTrackingAPI {
 	@ApiOperation(value = "query product tracking at Node-B of the supply chain process",
     notes = "Query product tracking info at node B")
 	public NodeBdata queryProductAtNodeB(@RequestParam String qrCodeID) {
+		log.info("queryProductAtNodeB {}", qrCodeID);
 		try {
 			
 			Credentials credentials = new UserAdmin().getDefaultCredentials();
 			NodeBdata nodeBdata = productTrackingService.queryProductTrackingAtNodeB(qrCodeID, credentials);
 			return nodeBdata;
 
+		} catch (NullPointerException ex) {
+			log.info("There is no product batch for request qr {}", qrCodeID);
+			throw new ResourceNotFound("ProductBatch Not Found", ex);
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			throw new InternalServerError("Error while query product tracking info", ex);
@@ -199,14 +202,17 @@ public class ProductTrackingAPI {
 	@ApiOperation(value = "query product tracking at Node-D of the supply chain process",
     notes = "Query product tracking info at node D")
 	public NodeDdata queryProductAtNodeD(@RequestParam String qrCodeID) {
+		log.info("queryProductAtNodeD {}", qrCodeID);
 		try {
 			
 			Credentials credentials = new UserAdmin().getDefaultCredentials();
 			NodeDdata nodeDdata = productTrackingService.queryProductTrackingAtNodeD(qrCodeID, credentials);
 			return nodeDdata;
-
+		} catch (NullPointerException ex) {
+			log.info("There is no product batch for request qr {}", qrCodeID);
+			throw new ResourceNotFound("ProductBatch Not Found", ex);
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.info("queryProductAtNodeB error", ex);
 			throw new InternalServerError("Error while query product tracking info", ex);
 		}
 	}
@@ -215,6 +221,7 @@ public class ProductTrackingAPI {
 	@ApiOperation(value = "query product tracking at Node-G of the supply chain process",
     notes = "Query product tracking info at node G")
 	public NodeGdata queryProductAtNodeG(@RequestParam String qrCodeID) {
+		log.info("queryProductAtNodeG {}", qrCodeID);
 		try {
 			
 			Credentials credentials = new UserAdmin().getDefaultCredentials();
@@ -231,6 +238,7 @@ public class ProductTrackingAPI {
 	@ApiOperation(value = "query product tracking at Node-G of the supply chain process",
     notes = "Query product tracking info at node I")
 	public NodeIdata queryProductAtNodeI(@RequestParam String qrCodeID) {
+		log.info("queryProductAtNodeI {}", qrCodeID);
 		try {
 			
 			Credentials credentials = new UserAdmin().getDefaultCredentials();
@@ -238,7 +246,7 @@ public class ProductTrackingAPI {
 			return nodeIdata;
 
 		} catch (Exception ex) {
-			ex.printStackTrace();
+			log.info("queryProductAtNodeB error", ex);
 			throw new InternalServerError("Error while query product tracking info", ex);
 		}
 	}
@@ -266,13 +274,14 @@ public class ProductTrackingAPI {
     notes = "This returns product batch info that is related to the QR code, based on QR code ID.")
 
     public ProductBatch getProductBatchByQRcode(@RequestParam String qrCodeID) throws Exception {
+    	log.info("getProductBatchByQRcode {}", qrCodeID);
     	try {
 	    	ProductBatch productBatchInfo = new ProductBatch();
 	    	Credentials credentials = new UserAdmin().getDefaultCredentials();
 	    	productBatchInfo = productTrackingService.getProductBatchInfoByQrCode(qrCodeID, credentials);
 	        return productBatchInfo;
     	} catch (Exception ex) {
-			ex.printStackTrace();
+    		log.info("queryProductAtNodeB error", ex);
 			throw new InternalServerError("Error while getting info", ex);
 		}
     }
@@ -300,14 +309,16 @@ public class ProductTrackingAPI {
     notes = "This returns tracking history.")
 
     public List<NodeData> getProductTrackingHistory(@RequestParam String qrCodeID) throws Exception {
+    	log.info("getProductTrackingHistory {}", qrCodeID);
     	try {
+    		
 	    	List<NodeData> listOfNodeData = new ArrayList<NodeData>();
 	    	Credentials credentials = new UserAdmin().getDefaultCredentials();
 	    	listOfNodeData = productTrackingService.getProductTrackingHistory(qrCodeID, credentials);  	    	
 	        return listOfNodeData;
       	} catch (Exception ex) {
-    			ex.printStackTrace();
-    			throw new InternalServerError("Error while getting info", ex);
+      		log.info("queryProductAtNodeB error", ex);
+			throw new InternalServerError("Error while getting info", ex);
     	}    
     }
     
@@ -329,6 +340,13 @@ public class ProductTrackingAPI {
     }
     */
 	
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+	public class ResourceNotFound extends RuntimeException {
+		private static final long serialVersionUID = 1L;
+		public ResourceNotFound(final String message, final Throwable cause) {
+			super(message);
+		}
+	}
 	
 	@ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
 	public class InternalServerError extends RuntimeException {
@@ -338,7 +356,6 @@ public class ProductTrackingAPI {
 		public InternalServerError(final String message, final Throwable cause) {
 			super(message);
 		}
-
 	}
 
  
