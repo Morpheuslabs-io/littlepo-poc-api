@@ -6,10 +6,13 @@ public class Orchard {
 	
 	// this is used for APIs to connect to the local POA blockchain network
 	
-	// private static final String PRIVATE_KEY = "0x7673b0ae99fed748dcb4648502dc032de69f529ca66d3891c29adcad9afcb4a8";
+	// private static final String PRIVATE_KEY = "0x3464c86b458388318e6c8e97e97a4b56908f3e171583516f74717555c4dcf05b";
 	
 	// this account is used to to access local Ganache
 	private static final String PRIVATE_KEY = "0xeaafe8a2221a1d023fe55fd9df3f6784ae91746863e279b9f7a286722cbc6d22";
+	
+	// this account is used to to access local Truffle
+	// private static final String PRIVATE_KEY = "0xc87509a1c067bbde78beb793e6fa76530b6382a4c0241e5e4a9ec0a0f44dc0d3";
 	
 	public static final Credentials CREDENTIALS = Credentials.create(PRIVATE_KEY);
 	
