@@ -142,7 +142,7 @@ public class ProductTrackingService {
 	public ProductBatch getProductBatchInfoByQrCode (String qrCodeID, Credentials credentials) throws Exception {
 		// get Product Batch Info by QR code ID (dxCodeID)
 		ProductBatch productBatch = new ProductBatch();
-		ContractController contractController = new ContractController();
+		ContractController contractController = new ContractController(web3Properties);
 		productBatch = contractController.getProductBatchInfoByQrCodeID(qrCodeID, credentials);
 		return productBatch;
 	}

@@ -592,14 +592,14 @@ public class ContractController extends AbstractContractManager {
 
 		List<Bytes32> productBatch1Value = productBatch1.getValue();
 
-		String bBatchNo = Web3jUtils.hexToASCII(new String(productBatch1Value.get(0).getValue()));
-		String productName = new String(productBatch1Value.get(1).getValue(), StandardCharsets.UTF_8);
-		String location = new String(productBatch1Value.get(2).getValue());
-		String productID = new String(productBatch1Value.get(3).getValue());
-		String producerID = new String(productBatch1Value.get(4).getValue());
-		String packageID = new String(productBatch1Value.get(5).getValue());
-		String packageType = new String(productBatch1Value.get(6).getValue());
-		String legalEntity = new String(productBatch1Value.get(7).getValue());	
+		String bBatchNo = Web3jUtils.removePadding(new String(productBatch1Value.get(0).getValue()));
+		String productName = Web3jUtils.removePadding(new String(productBatch1Value.get(1).getValue(), StandardCharsets.UTF_8));
+		String location = Web3jUtils.removePadding(new String(productBatch1Value.get(2).getValue()));
+		String productID = Web3jUtils.removePadding(new String(productBatch1Value.get(3).getValue()));
+		String producerID = Web3jUtils.removePadding(new String(productBatch1Value.get(4).getValue()));
+		String packageID = Web3jUtils.removePadding(new String(productBatch1Value.get(5).getValue()));
+		String packageType = Web3jUtils.removePadding(new String(productBatch1Value.get(6).getValue()));
+		String legalEntity = Web3jUtils.removePadding(new String(productBatch1Value.get(7).getValue()));	
 		
 		productBatch.setProductBatchNo(bBatchNo);
 		productBatch.setProductName(productName);

@@ -9,7 +9,7 @@ public class Orchard {
 	// private static final String PRIVATE_KEY = "0x7673b0ae99fed748dcb4648502dc032de69f529ca66d3891c29adcad9afcb4a8";
 	
 	// this account is used to to access local Ganache
-	private static final String PRIVATE_KEY = "eaafe8a2221a1d023fe55fd9df3f6784ae91746863e279b9f7a286722cbc6d22";
+	private static final String PRIVATE_KEY = "0xeaafe8a2221a1d023fe55fd9df3f6784ae91746863e279b9f7a286722cbc6d22";
 	
 	public static final Credentials CREDENTIALS = Credentials.create(PRIVATE_KEY);
 	
