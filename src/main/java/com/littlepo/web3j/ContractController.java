@@ -629,24 +629,24 @@ public class ContractController extends AbstractContractManager {
         
         List<NodeData> listOfNodeData = new ArrayList<NodeData> ();
         
-		accessLittlepoProductHistory(credentials);
+        accessLittlepoProductTracking(credentials);
 		
 		// get teaBag
 		
-		Address addressTeaBagContract 
-			= littlepoProductHistory.getBaseProducByQR(Web3jUtils.stringToBytes32(qrCodeID)).send();
+//		Address addressTeaBagContract 
+		Tuple3<DynamicArray<Bytes32>, DynamicArray<Bytes32>, DynamicArray<Uint256>> result = littlepoProductTracking.getProductTrackingInfo(Web3jUtils.stringToBytes32(qrCodeID)).send();
 		
-		TransactionReceiptProcessor transactionReceiptProcessor = new NoOpProcessor(web3j);
-
-		TransactionManager transactionManager = new FastRawTransactionManager(
-				web3j, 
-				credentials, 
-				ChainId.NONE, 
-				transactionReceiptProcessor);
+//		TransactionReceiptProcessor transactionReceiptProcessor = new NoOpProcessor(web3j);
+//
+//		TransactionManager transactionManager = new FastRawTransactionManager(
+//				web3j, 
+//				credentials, 
+//				ChainId.NONE, 
+//				transactionReceiptProcessor);
+//		
+//		TeaBag teaBag = TeaBag.load(addressTeaBagContract.getValue(), web3j, transactionManager, new DefaultGasProvider());
 		
-		TeaBag teaBag = TeaBag.load(addressTeaBagContract.getValue(), web3j, transactionManager, new DefaultGasProvider());
-		
-		Tuple3<DynamicArray<Bytes32>, DynamicArray<Bytes32>, DynamicArray<Uint256>> result = teaBag.getHistory().send();
+//		Tuple3<DynamicArray<Bytes32>, DynamicArray<Bytes32>, DynamicArray<Uint256>> result = teaBag.getHistory().send();
 		
 		List<Bytes32> bytes32NodeIDs = result.getValue1().getValue();
 		List<Bytes32> bytes32QrCodeIDs = result.getValue2().getValue();	
@@ -793,6 +793,33 @@ public class ContractController extends AbstractContractManager {
 			Timestamp timestamp2 = new Timestamp((new Date()).getTime());
 
 			System.out.println("accessLittlepoProductHistory: ended at " + timestamp2);
+		}
+		
+	}
+	
+	private void accessLittlepoProductTracking(Credentials credentials) throws Exception {
+		
+        Timestamp timestamp1 = new Timestamp((new Date()).getTime());
+		System.out.println("accessLittlepoProductTracking: started at " + timestamp1);
+        
+		TransactionReceiptProcessor transactionReceiptProcessor = new NoOpProcessor(web3j);
+
+		TransactionManager transactionManager = new FastRawTransactionManager(
+				web3j, 
+				credentials, 
+				ChainId.NONE, 
+				transactionReceiptProcessor); 
+		
+		String addressLittlepoProductTracking = web3Properties.getAddressLittlepoProductTracking();
+
+		System.out.println("accessLittlepoProductTracking: address is " + addressLittlepoProductTracking);
+
+		if (littlepoProductTracking == null) {
+			littlepoProductTracking = LittlepoProductTracking.load
+					(addressLittlepoProductTracking, web3j, transactionManager, new DefaultGasProvider()); // use default Transaction Manager
+			Timestamp timestamp2 = new Timestamp((new Date()).getTime());
+
+			System.out.println("accessLittlepoProductTracking: ended at " + timestamp2);
 		}
 		
 	}
