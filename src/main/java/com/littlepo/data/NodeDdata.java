@@ -4,12 +4,14 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.littlepo.utils.CommonConstants;
 
 @JsonInclude(Include.NON_NULL)
 public class NodeDdata extends NodeData{
 	
 	private String dxQrCodeID;
+	@JsonProperty("dQRcodeID")
 	private String dQRcodeID;
 	private String bBatchNo;
 	private String dBatchNo;
