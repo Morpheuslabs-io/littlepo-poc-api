@@ -250,6 +250,7 @@ public class ContractController extends AbstractContractManager {
         Bytes32 containerId = Web3jUtils.stringToBytes32(nodeDdata.getDQrCodeID());
         Bytes32 containerType = Web3jUtils.stringToBytes32(nodeDdata.getPackageType());
         Bytes32 legalEntiry = Web3jUtils.stringToBytes32(nodeDdata.getLegalEntity());
+        Bytes32 weight = Web3jUtils.stringToBytes32(nodeDdata.getWeight());
 
         
         // bytes32 _qrCodeId, (dxQrCodeId)
@@ -264,7 +265,7 @@ public class ContractController extends AbstractContractManager {
         // bytes32 _legalEntity
         
         DynamicArray<Bytes32> bArgs = 
-        		new DynamicArray<> (dxQrCodeID, dBatchNo, bBatchNo, productName, location, productId, producerId, containerId, containerType, legalEntiry);
+        		new DynamicArray<> (dxQrCodeID, dBatchNo, bBatchNo, productName, location, productId, producerId, containerId, containerType, legalEntiry,weight);
 
         String txHash = productPackerNode.addTeaBagBatch(dQrCodeID, bArgs).send().getTransactionHash();
         Timestamp timestamp3 = new Timestamp((new Date()).getTime());       

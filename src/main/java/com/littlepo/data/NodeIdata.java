@@ -3,15 +3,19 @@ package com.littlepo.data;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.littlepo.utils.CommonConstants;
 
 @JsonInclude(Include.NON_NULL)
 public class NodeIdata extends NodeData{
 	
+	@JsonProperty("dxQrCodeID")
 	private String dxQrCodeID;
 	private String iQRcodeID;
+	@JsonProperty("bBatchNo")
 	private String bBatchNo;
+	@JsonProperty("dBatchNo")
 	private String dBatchNo;
 	private String weight; // e.g. 15000 g
 	private String location;
