@@ -245,10 +245,12 @@ public class Web3jUtils {
 	}
 	
 	public static String convertUnixTimestamp (BigInteger unixTimestamp) {
-	
 		// convert unix timestamp to GMT+8 time
 		Date time = new Date(unixTimestamp.intValue()*1000L);
+		
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		formatter.setTimeZone(java.util.TimeZone.getTimeZone("GMT+8"));
+		
 		String timestamp = formatter.format(time);
 		return timestamp;
 	}
