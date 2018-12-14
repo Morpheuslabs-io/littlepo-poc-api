@@ -8,24 +8,28 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.littlepo.utils.CommonConstants;
 
 @JsonInclude(Include.NON_NULL)
-public class NodeDdata extends NodeData{
+public class NodeGdata extends NodeData{
 	
+	private String gQRcodeID;
 	private String dxQrCodeID;
+	
+	@JsonProperty("dQRcodeID")
 	private String dQRcodeID;
-	private String bQrCodeID;
 	private String bBatchNo;
 	private String dBatchNo;
 	private String weight; // e.g. 15000 g
 	private String location;
 	private String packageType;
 	private String producerID;
-	private String legalEntity1;
 	
 	public String getNodeID() {
-		return CommonConstants.NODE_TYPE_D;
-	}	
+		return CommonConstants.NODE_TYPE_G;
+	}
 	public String getNodeType() {
-		return CommonConstants.NODE_TYPE_D;
+		return CommonConstants.NODE_TYPE_G;
+	}
+	public String getGQrCodeID() {
+		return this.gQRcodeID;
 	}
 	public String getDQrCodeID() {
 		return this.dQRcodeID;
@@ -33,14 +37,9 @@ public class NodeDdata extends NodeData{
 	public String getDxQrCodeID() {
 		return this.dxQrCodeID;
 	}
-	public String getBQrCodeID() {
-		return this.bQrCodeID;
-	}
-	
 	public String getBbatchNo() {
 		return this.bBatchNo;
 	}
-	
 	public String getDbatchNo() {
 		return this.dBatchNo;
 	}
@@ -56,25 +55,20 @@ public class NodeDdata extends NodeData{
 	public String getProducerID() {
 		return this.producerID;
 	}
-	public String getLegalEntity1() {
-		return this.legalEntity1;
-	}
 	
 	
 	public void setDQrCodeID(String dQRcodeID) {
 		this.dQRcodeID = dQRcodeID;
 	}
+	public void setGQrCodeID(String gQRcodeID) {
+		this.gQRcodeID = gQRcodeID;
+	}
 	public void setDxQrCodeID(String dxQrCodeID) {
 		this.dxQrCodeID = dxQrCodeID;
 	}
-	public void setBQrCodeID(String bQrCodeID) {
-		this.bQrCodeID = bQrCodeID;
-	}
-	
 	public void setBbatchNo(String bBatchNo) {
 		this.bBatchNo = bBatchNo;
 	}
-	
 	public void setDbatchNo(String dBatchNo) {
 		this.dBatchNo = dBatchNo;
 	}
@@ -90,9 +84,6 @@ public class NodeDdata extends NodeData{
 	public void setProducerID(String producerID) {
 		this.producerID = producerID;
 	}	
-	public void setLegalEntity1(String  legalEntity1) {
-		this.legalEntity1 = legalEntity1;
-	}	
-	
+
 	
 }
