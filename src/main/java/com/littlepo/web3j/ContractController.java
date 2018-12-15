@@ -622,7 +622,7 @@ public class ContractController extends AbstractContractManager {
 		String packageID = Web3jUtils.removePadding(new String(productBatch1Value.get(5).getValue()));
 		String packageType = Web3jUtils.removePadding(new String(productBatch1Value.get(6).getValue()));
 		String legalEntity = Web3jUtils.removePadding(new String(productBatch1Value.get(7).getValue()));
-		String txHash = Web3jUtils.removePadding(new String(productBatch1Value.get(8).getValue()));
+		String txHash = Numeric.toHexString(productBatch1Value.get(8).getValue());
 		
 		String creationTime = Web3jUtils.convertUnixTimestamp(productBatch1.getValue2().getValue());
 		
