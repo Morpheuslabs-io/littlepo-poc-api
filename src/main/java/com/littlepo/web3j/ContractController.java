@@ -184,7 +184,7 @@ public class ContractController extends AbstractContractManager {
 	}
 	
 	public TxHashResponse trackProductAtPackerNode(NodeDdata nodeDdata, Credentials credentials) throws Exception {
-		log.info("request tracking bat packer node '{}'", MAPPER.writeValueAsString(nodeDdata));
+		log.info("request tracking at packer node '{}'", MAPPER.writeValueAsString(nodeDdata));
 		
         Timestamp timestamp1 = new Timestamp((new Date()).getTime());
         accessProductPackerNode(credentials);
@@ -243,6 +243,8 @@ public class ContractController extends AbstractContractManager {
 	public TxHashResponse addTeaBagAtPackNode(NodeDdata nodeDdata, Credentials credentials) throws Exception {
 		
         accessProductPackerNode(credentials);
+        
+		log.info("Add tea bag at packer node '{}'", MAPPER.writeValueAsString(nodeDdata));
         
         Bytes32 dQrCodeID = Web3jUtils.stringToBytes32(nodeDdata.getDQrCodeID());
         Bytes32 dxQrCodeID = Web3jUtils.stringToBytes32(nodeDdata.getDxQrCodeID());

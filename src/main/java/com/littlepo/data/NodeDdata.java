@@ -11,6 +11,7 @@ import com.littlepo.utils.CommonConstants;
 public class NodeDdata extends NodeData{
 	
 	private String dxQrCodeID;
+	@JsonProperty("dQRcodeID")
 	private String dQRcodeID;
 	private String bQrCodeID;
 	private String bBatchNo;
