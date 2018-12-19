@@ -166,6 +166,18 @@ public class ProductTrackingService {
 		return listOfNodeData;
 		
 	}
+	
+	
+	public List<String> getChidrenOfProduct (String parentQrCodeID, Credentials credentials) throws Exception {
+	
+		
+		List<String> listOfQrCodeIDs = new ArrayList<String>();
+		ContractController contractController = new ContractController(web3Properties);
+		listOfQrCodeIDs = contractController.getChildrenOfProduct(parentQrCodeID, credentials);
+		return listOfQrCodeIDs;
+		
+	}
+	
 	/*
 	public ProductTracking getProductTracking (String NodeID, String productBatchNo, Credentials credentials) throws Exception{
 		

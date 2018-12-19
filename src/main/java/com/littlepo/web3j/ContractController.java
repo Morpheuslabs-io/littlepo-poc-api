@@ -644,6 +644,30 @@ public class ContractController extends AbstractContractManager {
 		return productBatch;
 		
 	}
+	// get the list of children of a product - list of qrCodeIDs
+	
+	public List<String> getChildrenOfProduct(String parentQrCodeID, Credentials credentials) throws Exception {
+		
+   
+        Bytes32 parentQrCodeBytes32 = Web3jUtils.stringToBytes32(parentQrCodeID);
+        accessLittlepoProductHistory(credentials);
+        
+        // call the smart contract function
+        DynamicArray<Bytes32> listOfChildren = littlepoProductHistory.getChildsOfProductBatch(parentQrCodeBytes32).send();
+
+		List <Bytes32> listOfChidrenQrCodeIDsBytes32 = listOfChildren.getValue();
+		int count = listOfChidrenQrCodeIDsBytes32.size();
+		List <String>  listOfChildrenQrCodeIDs = new ArrayList<String> ();
+        
+        for (int i =0; i < count ; i++) {
+        	String qrCodeID = Web3jUtils.removePadding(new String(listOfChidrenQrCodeIDsBytes32.get(i).getValue()));
+        	listOfChildrenQrCodeIDs.add(qrCodeID);
+        }
+        
+		
+		return listOfChildrenQrCodeIDs;
+		
+	}
 	
 	public Product getProductInfoByProductID(String productID, Credentials credentials) throws Exception {
 		

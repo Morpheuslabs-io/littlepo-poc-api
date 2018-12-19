@@ -327,6 +327,24 @@ public class ProductTrackingAPI {
     	}    
     }
     
+    @RequestMapping(method = RequestMethod.GET, path = "/productchildren", produces = "application/json")
+	@ApiOperation(value = "Get children of a product (list of QR code IDs of the children products), query by the QR code ID of the parent product",
+    notes = "This returns a list of QR code IDs of the children products.")
+
+    public List<String> getChildrenOfProduct (@RequestParam String parentQrCodeID) throws Exception {
+    	log.info("getChildrenOfProduct {}", parentQrCodeID);
+    	try {
+    		
+	    	List<String> listOfChildrenQrCodeIDs = new ArrayList<String>();
+	    	Credentials credentials = new UserAdmin().getDefaultCredentials();
+	    	listOfChildrenQrCodeIDs = productTrackingService.getChidrenOfProduct(parentQrCodeID, credentials);  	    	
+	        return listOfChildrenQrCodeIDs ;
+      	} catch (Exception ex) {
+      		log.info("\"getChildrenOfProduct error", ex);
+			throw new InternalServerError("Error while getChildrenOfProduct", ex);
+    	}    
+    }
+    
     /*
     @RequestMapping(method = RequestMethod.GET, path = "/tracking", produces = "application/json")
 	@ApiOperation(value = "Get product tracking details for a tea bag QR code",
