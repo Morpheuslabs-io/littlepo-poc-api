@@ -327,7 +327,7 @@ public class ProductTrackingAPI {
     	}    
     }
     
-    @RequestMapping(method = RequestMethod.GET, path = "/productchildren", produces = "application/json")
+    @RequestMapping(method = RequestMethod.GET, path = "/children", produces = "application/json")
 	@ApiOperation(value = "Get children of a product (list of QR code IDs of the children products), query by the QR code ID of the parent product",
     notes = "This returns a list of QR code IDs of the children products.")
 
